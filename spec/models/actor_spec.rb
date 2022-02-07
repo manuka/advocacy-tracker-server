@@ -25,4 +25,22 @@ RSpec.describe Actor, type: :model do
       [Actor.count, ActorCategory.count, ActorMeasure.count, MeasureActor.count, Membership.count]
     }.from([2, 1, 1, 1, 1]).to([1, 0, 0, 0, 0])
   end
+
+  context "parent_id" do
+    subject { FactoryBot.create(:actor) }
+
+    it "can't be the record's ID" do
+      subject.parent_id = subject.id
+      expect(subject).to be_invalid
+      expect(subject.errors[:parent_id]).to(include("can't be the same as id"))
+    end
+
+    it "can't be its own descendant" do
+      child = FactoryBot.create(:actor, parent_id: subject.id)
+      expect(child).to be_valid
+      subject.parent_id = child.id
+      expect(subject).to be_invalid
+      expect(subject.errors[:parent_id]).to include("can't be its own descendant")
+    end
+  end
 end

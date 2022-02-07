@@ -1,5 +1,7 @@
 class Actor < VersionedRecord
   belongs_to :actortype, required: true
+  belongs_to :manager, class_name: "User", required: false
+  belongs_to :parent, class_name: "Actor", required: false
 
   has_many :memberships, foreign_key: :memberof_id, dependent: :destroy
   has_many :members, class_name: "Actor", through: :memberships, source: :member
@@ -17,4 +19,20 @@ class Actor < VersionedRecord
   has_many :passive_measures, through: :measure_actors
 
   validates :title, presence: true
+  validate :different_parent, :not_own_descendant
+
+  private
+
+  def different_parent
+    if parent_id && parent_id == id
+      errors.add(:parent_id, "can't be the same as id")
+    end
+  end
+
+  def not_own_descendant
+    measure_parent = self
+    while (measure_parent = measure_parent.parent)
+      errors.add(:parent_id, "can't be its own descendant") if measure_parent.id == id
+    end
+  end
 end
