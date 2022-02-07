@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_23_224010) do
+ActiveRecord::Schema.define(version: 2022_02_07_081300) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -61,8 +61,16 @@ ActiveRecord::Schema.define(version: 2022_01_23_224010) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "created_by_id"
     t.bigint "updated_by_id"
+    t.string "prefix"
+    t.string "email"
+    t.string "phone"
+    t.text "address"
+    t.bigint "manager_id"
+    t.bigint "parent_id"
     t.index ["actortype_id"], name: "index_actors_on_actortype_id"
     t.index ["created_by_id"], name: "index_actors_on_created_by_id"
+    t.index ["manager_id"], name: "index_actors_on_manager_id"
+    t.index ["parent_id"], name: "index_actors_on_parent_id"
     t.index ["updated_by_id"], name: "index_actors_on_updated_by_id"
   end
 
@@ -487,7 +495,9 @@ ActiveRecord::Schema.define(version: 2022_01_23_224010) do
   add_foreign_key "actor_measures", "resources"
   add_foreign_key "actor_measures", "users", column: "created_by_id"
   add_foreign_key "actor_measures", "users", column: "updated_by_id"
+  add_foreign_key "actors", "actors", column: "parent_id"
   add_foreign_key "actors", "actortypes"
+  add_foreign_key "actors", "users", column: "manager_id"
   add_foreign_key "actortype_taxonomies", "actortypes"
   add_foreign_key "actortype_taxonomies", "taxonomies"
   add_foreign_key "framework_frameworks", "frameworks"
