@@ -23,6 +23,7 @@ Rails.application.routes.draw do
   resources :recommendation_categories
   resources :resourcetypes, only: [:index, :show]
   resources :user_categories
+  resources :user_measures
   resources :recommendation_measures
   resources :categories do
     resources :recommendations, only: [:index, :show]

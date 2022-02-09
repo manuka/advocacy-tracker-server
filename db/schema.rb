@@ -444,8 +444,8 @@ ActiveRecord::Schema.define(version: 2022_02_09_074026) do
   create_table "user_measures", id: :serial, force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "measure_id", null: false
-    t.bigint "created_by_id", null: false
-    t.bigint "updated_by_id", null: false
+    t.bigint "created_by_id"
+    t.bigint "updated_by_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["created_by_id"], name: "index_user_measures_on_created_by_id"
