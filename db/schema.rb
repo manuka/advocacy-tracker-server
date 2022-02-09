@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_07_081300) do
+ActiveRecord::Schema.define(version: 2022_02_09_074026) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -441,6 +441,20 @@ ActiveRecord::Schema.define(version: 2022_02_07_081300) do
     t.integer "created_by_id"
   end
 
+  create_table "user_measures", id: :serial, force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "measure_id", null: false
+    t.bigint "created_by_id"
+    t.bigint "updated_by_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_by_id"], name: "index_user_measures_on_created_by_id"
+    t.index ["measure_id"], name: "index_user_measures_on_measure_id"
+    t.index ["updated_by_id"], name: "index_user_measures_on_updated_by_id"
+    t.index ["user_id", "measure_id"], name: "index_user_measures_on_user_id_and_measure_id", unique: true
+    t.index ["user_id"], name: "index_user_measures_on_user_id"
+  end
+
   create_table "user_roles", id: :serial, force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "role_id", null: false
@@ -528,4 +542,8 @@ ActiveRecord::Schema.define(version: 2022_02_07_081300) do
   add_foreign_key "recommendations", "frameworks"
   add_foreign_key "resources", "resourcetypes"
   add_foreign_key "taxonomies", "frameworks"
+  add_foreign_key "user_measures", "measures"
+  add_foreign_key "user_measures", "users"
+  add_foreign_key "user_measures", "users", column: "created_by_id"
+  add_foreign_key "user_measures", "users", column: "updated_by_id"
 end
