@@ -95,11 +95,11 @@ Run `docker-compose up` to create and start a DB and app image, with the app lis
 
 If you already have a database instance and just wish to run the app you will need to build the image:
 
-`docker build . -t "marine-defrag-server"`
+`docker build . -t "advocacy-tracker-server"`
 
 And then run the resulting image:
 
-`docker run marine-defrag-server -P -e PGHOST=YOUR_DB_HOST -e PGUSER=YOUR_PG_USER`
+`docker run advocacy-tracker-server -P -e PGHOST=YOUR_DB_HOST -e PGUSER=YOUR_PG_USER`
 
 ##### Without Docker
 
