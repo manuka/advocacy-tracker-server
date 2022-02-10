@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_09_074026) do
+ActiveRecord::Schema.define(version: 2022_02_10_063751) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -433,6 +433,20 @@ ActiveRecord::Schema.define(version: 2022_02_09_074026) do
     t.index ["framework_id"], name: "index_taxonomies_on_framework_id"
   end
 
+  create_table "user_actors", id: :serial, force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "actor_id", null: false
+    t.bigint "created_by_id"
+    t.bigint "updated_by_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["actor_id"], name: "index_user_actors_on_actor_id"
+    t.index ["created_by_id"], name: "index_user_actors_on_created_by_id"
+    t.index ["updated_by_id"], name: "index_user_actors_on_updated_by_id"
+    t.index ["user_id", "actor_id"], name: "index_user_actors_on_user_id_and_actor_id", unique: true
+    t.index ["user_id"], name: "index_user_actors_on_user_id"
+  end
+
   create_table "user_categories", id: :serial, force: :cascade do |t|
     t.integer "user_id"
     t.integer "category_id"
@@ -542,6 +556,10 @@ ActiveRecord::Schema.define(version: 2022_02_09_074026) do
   add_foreign_key "recommendations", "frameworks"
   add_foreign_key "resources", "resourcetypes"
   add_foreign_key "taxonomies", "frameworks"
+  add_foreign_key "user_actors", "actors"
+  add_foreign_key "user_actors", "users"
+  add_foreign_key "user_actors", "users", column: "created_by_id"
+  add_foreign_key "user_actors", "users", column: "updated_by_id"
   add_foreign_key "user_measures", "measures"
   add_foreign_key "user_measures", "users"
   add_foreign_key "user_measures", "users", column: "created_by_id"
