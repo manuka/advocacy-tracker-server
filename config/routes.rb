@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   resources :memberships, only: [:index, :show, :create, :destroy]
   resources :recommendation_categories
   resources :resourcetypes, only: [:index, :show]
+  resources :user_actors
   resources :user_categories
   resources :user_measures
   resources :recommendation_measures
