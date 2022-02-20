@@ -33,30 +33,35 @@ class Seeds
     # 1 Countries
     countries = Actortype.create!(
       title: "Country",
-      has_members: true
+      has_members: true,
+      is_active: true
     )
 
     # 2 Organisations
     orgs = Actortype.create!(
       title: "Organisation",
-      has_members: true
+      has_members: true,
+      is_active: true
     )
 
     # 3 Contacts (external)
     contacts = Actortype.create!(
-      title: "Contacts"
+      title: "Contacts",
+      is_active: true
     )
 
     # 4 Regions
     regions = Actortype.create!(
       title: "Region",
-      has_members: true
+      has_members: true,
+      is_active: true
     )
 
     # 5 Groups
     groups = Actortype.create!(
       title: "Group",
-      has_members: true
+      has_members: true,
+      is_active: true
     )
 
     # set up Activity Types with taxonomies ########################################################
