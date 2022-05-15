@@ -70,7 +70,7 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
   # config.action_mailer.raise_delivery_errors = false
 
   # Production MailGun SMTP config
-  if ENV.fetch("EMAIL_ENABLED", false)
+  if ENV.fetch("EMAIL_ENABLED", false) == false
     config.action_mailer.perform_deliveries = false
     config.action_mailer.raise_delivery_errors = false
   else
