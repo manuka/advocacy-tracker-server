@@ -14,6 +14,10 @@ RSpec.describe Category, type: :model do
   it { is_expected.to have_many :categories }
   it { is_expected.to have_many :children_due_dates }
 
+  it "is expected to default private to false" do
+    expect(subject.private).to eq(false)
+  end
+
   context "Sub-relation validations" do
     it "Should update parent_id with correct taxonomy relation" do
       category = FactoryBot.create(:category, :parent_category)

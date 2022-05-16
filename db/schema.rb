@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 2022_05_16_082216) do
     t.string "url"
     t.decimal "population"
     t.decimal "gdp"
-    t.boolean "private", default: true
+    t.boolean "private", default: false
     t.boolean "draft", default: true
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -120,8 +120,8 @@ ActiveRecord::Schema.define(version: 2022_05_16_082216) do
     t.integer "parent_id"
     t.date "date"
     t.integer "created_by_id"
-    t.boolean "private", default: true
     t.boolean "is_archive", default: false
+    t.boolean "private", default: false
     t.index ["draft"], name: "index_categories_on_draft"
     t.index ["manager_id"], name: "index_categories_on_manager_id"
     t.index ["taxonomy_id"], name: "index_categories_on_taxonomy_id"
@@ -184,6 +184,7 @@ ActiveRecord::Schema.define(version: 2022_05_16_082216) do
     t.integer "updated_by_id"
     t.integer "created_by_id"
     t.boolean "is_archive", default: false
+    t.boolean "private", default: false
     t.index ["created_at"], name: "index_indicators_on_created_at"
     t.index ["draft"], name: "index_indicators_on_draft"
     t.index ["manager_id"], name: "index_indicators_on_manager_id"
@@ -278,8 +279,8 @@ ActiveRecord::Schema.define(version: 2022_05_16_082216) do
     t.string "status_lbs_protocol"
     t.decimal "amount"
     t.string "amount_comment"
-    t.boolean "private", default: true
     t.boolean "is_archive", default: false
+    t.boolean "private", default: false
     t.index ["draft"], name: "index_measures_on_draft"
     t.index ["measuretype_id"], name: "index_measures_on_measuretype_id"
     t.index ["parent_id"], name: "index_measures_on_parent_id"
@@ -325,7 +326,7 @@ ActiveRecord::Schema.define(version: 2022_05_16_082216) do
     t.integer "order"
     t.integer "updated_by_id"
     t.integer "created_by_id"
-    t.boolean "private", default: true
+    t.boolean "private", default: false
     t.index ["draft"], name: "index_pages_on_draft"
     t.index ["private"], name: "index_pages_on_private"
   end
@@ -403,7 +404,7 @@ ActiveRecord::Schema.define(version: 2022_05_16_082216) do
     t.text "description"
     t.text "url"
     t.bigint "resourcetype_id", null: false
-    t.boolean "private", default: true
+    t.boolean "private", default: false
     t.boolean "draft", default: true
     t.datetime "publication_date"
     t.datetime "access_date"

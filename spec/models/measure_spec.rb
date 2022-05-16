@@ -8,6 +8,10 @@ RSpec.describe Measure, type: :model do
   it { is_expected.to have_many :due_dates }
   it { is_expected.to have_many :progress_reports }
 
+  it "is expected to default private to false" do
+    expect(subject.private).to eq(false)
+  end
+
   context "parent_id" do
     subject do
       described_class.create(

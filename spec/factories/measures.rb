@@ -12,5 +12,13 @@ FactoryBot.define do
     trait :without_category do
       categories { [] }
     end
+
+    trait :not_private do
+      private { false }
+    end
+
+    trait :private do
+      private { true }
+    end
   end
 end

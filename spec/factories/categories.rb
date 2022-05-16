@@ -13,5 +13,13 @@ FactoryBot.define do
     trait :sub_category do
       title { "sub" }
     end
+
+    trait :not_private do
+      private { false }
+    end
+
+    trait :private do
+      private { true }
+    end
   end
 end
