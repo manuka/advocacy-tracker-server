@@ -4,15 +4,13 @@ require "rails_helper"
 require "json"
 
 RSpec.describe MeasuresController, type: :controller do
-  let(:admin) { FactoryBot.create(:user, :manager) }
+  let(:admin) { FactoryBot.create(:user, :admin) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
 
   describe "Get index" do
     subject { get :index, format: :json }
-    let!(:measure) { FactoryBot.create(:measure) }
-    let!(:draft_measure) { FactoryBot.create(:measure, draft: true) }
 
     context "when not signed in" do
       it { expect(subject).to be_forbidden }
@@ -24,23 +22,52 @@ RSpec.describe MeasuresController, type: :controller do
         expect(subject).to be_forbidden
       end
 
-      it "admin will see draft measures" do
-        sign_in admin
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(2)
+      context "draft" do
+        let!(:measure) { FactoryBot.create(:measure) }
+        let!(:draft_measure) { FactoryBot.create(:measure, draft: true) }
+
+        it "admin will see draft measures" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will see draft measures" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "analyst will not see draft measures" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
       end
 
-      it "manager will see draft measures" do
-        sign_in manager
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(2)
-      end
+      context "private" do
+        let!(:measure) { FactoryBot.create(:measure, :not_private) }
+        let!(:private_measure) { FactoryBot.create(:measure, :private) }
+        let!(:private_measure_by_manager) { FactoryBot.create(:measure, :private, created_by_id: manager.id) }
 
-      it "analyst will not see draft measures" do
-        sign_in analyst
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(3)
+        end
 
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(1)
+        it "manager who created will see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager who didn't create will not see" do
+          sign_in FactoryBot.create(:user, :manager)
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
       end
     end
 
@@ -89,16 +116,40 @@ RSpec.describe MeasuresController, type: :controller do
   describe "Get show" do
     let(:measure) { FactoryBot.create(:measure) }
     let(:draft_measure) { FactoryBot.create(:measure, draft: true) }
-    subject { get :show, params: {id: measure}, format: :json }
+    let(:private_measure) { FactoryBot.create(:measure, :private) }
+    let(:private_measure_by_manager) { FactoryBot.create(:measure, :private, created_by_id: manager.id) }
+    let(:requested_resource) { measure }
+
+    subject { get :show, params: {id: requested_resource}, format: :json }
 
     context "when not signed in" do
       it { expect(subject).to be_forbidden }
     end
 
     context "when signed in" do
-      before { sign_in admin }
+      context "as admin" do
+        before { sign_in admin }
 
-      it { expect(subject).to be_ok }
+        it { expect(subject).to be_ok }
+      end
+
+      context "as manager" do
+        before { sign_in manager }
+
+        it { expect(subject).to be_ok }
+
+        context "who created will see" do
+          let(:requested_resource) { private_measure_by_manager }
+
+          it { expect(subject).to be_ok }
+        end
+
+        context "who didn't create won't see" do
+          let(:requested_resource) { private_measure }
+
+          it { expect(subject).to be_not_found }
+        end
+      end
     end
   end
 

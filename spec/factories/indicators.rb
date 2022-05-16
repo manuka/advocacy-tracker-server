@@ -31,5 +31,13 @@ FactoryBot.define do
     trait :with_manager do
       manager { create(:user) }
     end
+
+    trait :not_private do
+      private { false }
+    end
+
+    trait :private do
+      private { true }
+    end
   end
 end
