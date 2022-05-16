@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_10_064811) do
+ActiveRecord::Schema.define(version: 2022_05_16_082216) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -67,6 +67,7 @@ ActiveRecord::Schema.define(version: 2022_02_10_064811) do
     t.text "address"
     t.bigint "manager_id"
     t.bigint "parent_id"
+    t.boolean "is_archive", default: false
     t.index ["actortype_id"], name: "index_actors_on_actortype_id"
     t.index ["created_by_id"], name: "index_actors_on_created_by_id"
     t.index ["manager_id"], name: "index_actors_on_manager_id"
@@ -120,6 +121,7 @@ ActiveRecord::Schema.define(version: 2022_02_10_064811) do
     t.date "date"
     t.integer "created_by_id"
     t.boolean "private", default: true
+    t.boolean "is_archive", default: false
     t.index ["draft"], name: "index_categories_on_draft"
     t.index ["manager_id"], name: "index_categories_on_manager_id"
     t.index ["taxonomy_id"], name: "index_categories_on_taxonomy_id"
@@ -181,6 +183,7 @@ ActiveRecord::Schema.define(version: 2022_02_10_064811) do
     t.string "reference"
     t.integer "updated_by_id"
     t.integer "created_by_id"
+    t.boolean "is_archive", default: false
     t.index ["created_at"], name: "index_indicators_on_created_at"
     t.index ["draft"], name: "index_indicators_on_draft"
     t.index ["manager_id"], name: "index_indicators_on_manager_id"
@@ -276,6 +279,7 @@ ActiveRecord::Schema.define(version: 2022_02_10_064811) do
     t.decimal "amount"
     t.string "amount_comment"
     t.boolean "private", default: true
+    t.boolean "is_archive", default: false
     t.index ["draft"], name: "index_measures_on_draft"
     t.index ["measuretype_id"], name: "index_measures_on_measuretype_id"
     t.index ["parent_id"], name: "index_measures_on_parent_id"
@@ -408,6 +412,7 @@ ActiveRecord::Schema.define(version: 2022_02_10_064811) do
     t.bigint "updated_by_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "is_archive", default: false
     t.index ["created_by_id"], name: "index_resources_on_created_by_id"
     t.index ["resourcetype_id"], name: "index_resources_on_resourcetype_id"
     t.index ["updated_by_id"], name: "index_resources_on_updated_by_id"
