@@ -9,6 +9,10 @@ RSpec.describe Indicator, type: :model do
   it { is_expected.to have_many :recommendations }
   it { is_expected.to belong_to(:manager).optional }
 
+  it "is expected to default private to false" do
+    expect(subject.private).to eq(false)
+  end
+
   context "due_date field validations" do
     let!(:indicator_with_repeat) { FactoryBot.create(:indicator, :with_repeat) }
     let!(:indicator_without_repeat) { FactoryBot.create(:indicator, :without_repeat) }
