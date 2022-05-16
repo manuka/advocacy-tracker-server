@@ -4,7 +4,7 @@ require "rails_helper"
 require "json"
 
 RSpec.describe MeasuresController, type: :controller do
-  let(:admin) { FactoryBot.create(:user, :manager) }
+  let(:admin) { FactoryBot.create(:user, :admin) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
