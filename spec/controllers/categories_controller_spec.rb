@@ -2,14 +2,13 @@ require "rails_helper"
 require "json"
 
 RSpec.describe CategoriesController, type: :controller do
+  let(:admin) { FactoryBot.create(:user, :admin) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
   let(:taxonomy) { FactoryBot.create(:taxonomy) }
 
   describe "Get index" do
-    let!(:category) { FactoryBot.create(:category) }
-    let!(:draft_category) { FactoryBot.create(:category, draft: true) }
     subject { get :index, format: :json }
 
     context "when not signed in" do
@@ -17,21 +16,50 @@ RSpec.describe CategoriesController, type: :controller do
     end
 
     context "when signed in" do
-      it "guest will be forbidden" do
-        sign_in guest
-        expect(subject).to be_forbidden
+      context "draft" do
+        let!(:category) { FactoryBot.create(:category) }
+        let!(:draft_category) { FactoryBot.create(:category, draft: true) }
+
+        it "guest will be forbidden" do
+          sign_in guest
+          expect(subject).to be_forbidden
+        end
+
+        it "analyst will see non-draft categories" do
+          sign_in analyst
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "manager will see draft categories" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
       end
 
-      it "analyst will see non-draft categories" do
-        sign_in analyst
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(1)
-      end
+      context "private" do
+        let!(:category) { FactoryBot.create(:category, :not_private) }
+        let!(:private_category) { FactoryBot.create(:category, :private) }
+        let!(:private_category_by_manager) { FactoryBot.create(:category, :private, created_by_id: manager.id) }
 
-      it "manager will see draft categories" do
-        sign_in manager
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(2)
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(3)
+        end
+
+        it "manager who created will see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager who didn't create will not see" do
+          sign_in FactoryBot.create(:user, :manager)
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
       end
     end
   end

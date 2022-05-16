@@ -11,8 +11,6 @@ RSpec.describe ActorsController, type: :controller do
 
   describe "Get index" do
     subject { get :index, format: :json }
-    let!(:actor) { FactoryBot.create(:actor, :not_draft) }
-    let!(:draft_actor) { FactoryBot.create(:actor) }
 
     context "when not signed in" do
       it { expect(subject).to be_forbidden }
@@ -24,23 +22,52 @@ RSpec.describe ActorsController, type: :controller do
         expect(subject).to be_forbidden
       end
 
-      it "admin will see draft actors" do
-        sign_in admin
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(2)
+      context "draft" do
+        let!(:actor) { FactoryBot.create(:actor, :not_draft) }
+        let!(:draft_actor) { FactoryBot.create(:actor) }
+
+        it "admin will see draft actors" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will see draft actors" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "analyst will not see draft actors" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
       end
 
-      it "manager will see draft actors" do
-        sign_in manager
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(2)
-      end
+      context "private" do
+        let!(:actor) { FactoryBot.create(:actor, :not_private) }
+        let!(:private_actor) { FactoryBot.create(:actor, :private) }
+        let!(:private_actor_by_manager) { FactoryBot.create(:actor, :private, created_by_id: manager.id) }
 
-      it "analyst will not see draft actors" do
-        sign_in analyst
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(3)
+        end
 
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(1)
+        it "manager who created will see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager who didn't create will not see" do
+          sign_in FactoryBot.create(:user, :manager)
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
       end
     end
   end

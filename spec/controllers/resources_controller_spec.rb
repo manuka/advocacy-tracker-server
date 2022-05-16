@@ -2,31 +2,64 @@ require "rails_helper"
 require "json"
 
 RSpec.describe ResourcesController, type: :controller do
+  let(:admin) { FactoryBot.create(:user, :admin) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
+  let(:guest) { FactoryBot.create(:user) }
+  let(:manager) { FactoryBot.create(:user, :manager) }
 
   describe "Get index" do
     subject { get :index, format: :json }
     let!(:resource) { FactoryBot.create(:resource) }
-    let!(:draft_resource) { FactoryBot.create(:resource, draft: true) }
 
     context "when not signed in" do
       it { expect(subject).to be_forbidden }
     end
 
     context "when signed in" do
-      let(:guest) { FactoryBot.create(:user) }
-      let(:user) { FactoryBot.create(:user, :manager) }
-
       context "guest" do
         before { sign_in guest }
 
         it { expect(subject).to be_forbidden }
       end
 
-      it "manager will see draft resources" do
-        sign_in user
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(2)
+      context "draft" do
+        let!(:draft_resource) { FactoryBot.create(:resource, draft: true) }
+
+        it "admin will see draft resources" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will see draft resources" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+      end
+
+      context "private" do
+        let!(:resource) { FactoryBot.create(:resource, :not_private) }
+        let!(:private_resource) { FactoryBot.create(:resource, :private) }
+        let!(:private_resource_by_manager) { FactoryBot.create(:resource, :private, created_by_id: manager.id) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(3)
+        end
+
+        it "manager who created will see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager who didn't create will not see" do
+          sign_in FactoryBot.create(:user, :manager)
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
       end
     end
   end
@@ -73,9 +106,6 @@ RSpec.describe ResourcesController, type: :controller do
     end
 
     context "when signed in" do
-      let(:admin) { FactoryBot.create(:user, :admin) }
-      let(:guest) { FactoryBot.create(:user) }
-      let(:manager) { FactoryBot.create(:user, :manager) }
       let(:taxonomy) { FactoryBot.create(:taxonomy) }
       let(:resourcetype) { FactoryBot.create(:resourcetype) }
 
@@ -141,10 +171,6 @@ RSpec.describe ResourcesController, type: :controller do
     end
 
     context "when user signed in" do
-      let(:admin) { FactoryBot.create(:user, :admin) }
-      let(:guest) { FactoryBot.create(:user) }
-      let(:manager) { FactoryBot.create(:user, :manager) }
-
       it "will not allow a guest to update a resource" do
         sign_in guest
         expect(subject).to be_forbidden
@@ -210,10 +236,6 @@ RSpec.describe ResourcesController, type: :controller do
     end
 
     context "when user signed in" do
-      let(:admin) { FactoryBot.create(:user, :admin) }
-      let(:guest) { FactoryBot.create(:user) }
-      let(:manager) { FactoryBot.create(:user, :manager) }
-
       it "will not allow a guest to delete a resource" do
         sign_in guest
         expect(subject).to be_forbidden

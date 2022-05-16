@@ -2,29 +2,58 @@ require "rails_helper"
 require "json"
 
 RSpec.describe PagesController, type: :controller do
+  let(:admin) { FactoryBot.create(:user, :admin) }
+  let(:analyst) { FactoryBot.create(:user, :analyst) }
+  let(:guest) { FactoryBot.create(:user) }
+  let(:manager) { FactoryBot.create(:user, :manager) }
+
   describe "Get index" do
     subject { get :index, format: :json }
     let!(:page) { FactoryBot.create(:page) }
-    let!(:draft_page) { FactoryBot.create(:page, draft: true) }
 
     context "when not signed in" do
       it { expect(subject).to be_forbidden }
     end
 
     context "when signed in" do
-      let(:guest) { FactoryBot.create(:user) }
-      let(:user) { FactoryBot.create(:user, :manager) }
-
       context "guest" do
         before { sign_in guest }
 
         it { expect(subject).to be_forbidden }
       end
 
-      it "manager will see draft pages" do
-        sign_in user
-        json = JSON.parse(subject.body)
-        expect(json["data"].length).to eq(2)
+      context "draft" do
+        let!(:draft_page) { FactoryBot.create(:page, draft: true) }
+
+        it "manager will see draft pages" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+      end
+
+      context "private" do
+        let!(:page) { FactoryBot.create(:page, :not_private) }
+        let!(:private_page) { FactoryBot.create(:page, :private) }
+        let!(:private_page_by_manager) { FactoryBot.create(:page, :private, created_by_id: manager.id) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(3)
+        end
+
+        it "manager who created will see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager who didn't create will not see" do
+          sign_in FactoryBot.create(:user, :manager)
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
       end
     end
   end
@@ -47,14 +76,14 @@ RSpec.describe PagesController, type: :controller do
       context "as analyst" do
         context "will show page" do
           subject { get :show, params: {id: page}, format: :json }
-          before { sign_in FactoryBot.create(:user, :analyst) }
+          before { sign_in analyst }
 
           it { expect(subject).to be_ok }
         end
 
         context "will not show draft page" do
           subject { get :show, params: {id: draft_page}, format: :json }
-          before { sign_in FactoryBot.create(:user, :analyst) }
+          before { sign_in analyst }
 
           it { expect(subject).to be_not_found }
         end
@@ -71,9 +100,6 @@ RSpec.describe PagesController, type: :controller do
     end
 
     context "when signed in" do
-      let(:admin) { FactoryBot.create(:user, :admin) }
-      let(:guest) { FactoryBot.create(:user) }
-      let(:manager) { FactoryBot.create(:user, :manager) }
       let(:taxonomy) { FactoryBot.create(:taxonomy) }
 
       subject do
@@ -134,10 +160,6 @@ RSpec.describe PagesController, type: :controller do
     end
 
     context "when user signed in" do
-      let(:admin) { FactoryBot.create(:user, :admin) }
-      let(:guest) { FactoryBot.create(:user) }
-      let(:manager) { FactoryBot.create(:user, :manager) }
-
       it "will not allow a guest to update a page" do
         sign_in guest
         expect(subject).to be_forbidden
@@ -203,10 +225,6 @@ RSpec.describe PagesController, type: :controller do
     end
 
     context "when user signed in" do
-      let(:admin) { FactoryBot.create(:user, :admin) }
-      let(:guest) { FactoryBot.create(:user) }
-      let(:manager) { FactoryBot.create(:user, :manager) }
-
       it "will not allow a guest to delete a page" do
         sign_in guest
         expect(subject).to be_forbidden
