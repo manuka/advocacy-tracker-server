@@ -18,7 +18,8 @@ class ActorPolicy < ApplicationPolicy
       :prefix,
       :private,
       :title,
-      :url
+      :url,
+      :is_archive
     ]
   end
 end

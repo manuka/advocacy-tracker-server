@@ -9,7 +9,8 @@ class ResourceSerializer
     :status,
     :title,
     :resourcetype_id,
-    :url
+    :url,
+    :is_archive
 
   set_type :resources
 end

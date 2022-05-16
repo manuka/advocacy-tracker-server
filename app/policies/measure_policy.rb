@@ -27,6 +27,7 @@ class MeasurePolicy < ApplicationPolicy
       :target_date,
       :title,
       :url,
+      :is_archive,
       measure_categories_attributes: [
         :category_id,
         category_attributes: [

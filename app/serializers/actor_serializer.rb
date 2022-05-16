@@ -17,7 +17,8 @@ class ActorSerializer
     :prefix,
     :private,
     :title,
-    :url
+    :url,
+    :is_archive
   )
 
   set_type :actors

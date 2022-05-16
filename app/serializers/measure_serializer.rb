@@ -25,7 +25,8 @@ class MeasureSerializer
     :target_date_comment,
     :target_date,
     :title,
-    :url
+    :url,
+    :is_archive
   )
 
   set_type :measures

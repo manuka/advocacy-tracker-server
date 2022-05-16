@@ -11,6 +11,8 @@ class IndicatorPolicy < ApplicationPolicy
       :repeat,
       :end_date,
       :reference,
+      :private,
+      :is_archive,
       measure_indicators_attributes: [:measure_id,
         measure_attributes: [:id, :title, :description, :target_date, :draft]]]
   end
