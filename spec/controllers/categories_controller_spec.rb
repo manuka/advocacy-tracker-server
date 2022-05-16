@@ -66,10 +66,40 @@ RSpec.describe CategoriesController, type: :controller do
 
   describe "Get show" do
     let(:category) { FactoryBot.create(:category) }
-    subject { get :show, params: {id: category}, format: :json }
+    let(:private_category) { FactoryBot.create(:category, :private) }
+    let(:private_category_by_manager) { FactoryBot.create(:category, :private, created_by_id: manager.id) }
+    let(:requested_resource) { category }
+
+    subject { get :show, params: {id: requested_resource}, format: :json }
 
     context "when not signed in" do
       it { expect(subject).to be_forbidden }
+    end
+
+    context "when signed in" do
+      context "as admin" do
+        before { sign_in admin }
+
+        it { expect(subject).to be_ok }
+      end
+
+      context "as manager" do
+        before { sign_in manager }
+
+        it { expect(subject).to be_ok }
+
+        context "who created will see" do
+          let(:requested_resource) { private_category_by_manager }
+
+          it { expect(subject).to be_ok }
+        end
+
+        context "who didn't create won't see" do
+          let(:requested_resource) { private_category }
+
+          it { expect(subject).to be_not_found }
+        end
+      end
     end
   end
 

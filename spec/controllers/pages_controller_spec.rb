@@ -73,19 +73,49 @@ RSpec.describe PagesController, type: :controller do
     end
 
     context "when signed in" do
+      let(:private_page_by_manager) { FactoryBot.create(:page, :private, created_by_id: manager.id) }
+      let(:private_page) { FactoryBot.create(:page, :private) }
+      let(:requested_resource) { page }
+      subject { get :show, params: {id: requested_resource}, format: :json }
+
       context "as analyst" do
         context "will show page" do
-          subject { get :show, params: {id: page}, format: :json }
+          let(:requested_resource) { page }
           before { sign_in analyst }
 
           it { expect(subject).to be_ok }
         end
 
         context "will not show draft page" do
-          subject { get :show, params: {id: draft_page}, format: :json }
+          let(:requested_resource) { draft_page }
+
           before { sign_in analyst }
 
           it { expect(subject).to be_not_found }
+        end
+
+        context "as admin" do
+          before { sign_in admin }
+
+          it { expect(subject).to be_ok }
+        end
+
+        context "as manager" do
+          before { sign_in manager }
+
+          it { expect(subject).to be_ok }
+
+          context "who created will see" do
+            let(:requested_resource) { private_page_by_manager }
+
+            it { expect(subject).to be_ok }
+          end
+
+          context "who didn't create won't see" do
+            let(:requested_resource) { private_page }
+
+            it { expect(subject).to be_not_found }
+          end
         end
       end
     end

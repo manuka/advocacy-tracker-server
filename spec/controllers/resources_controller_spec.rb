@@ -65,33 +65,66 @@ RSpec.describe ResourcesController, type: :controller do
   end
 
   describe "Get show" do
-    let(:resource) { FactoryBot.create(:resource) }
     let(:draft_resource) { FactoryBot.create(:resource, draft: true) }
-    subject { get :show, params: {id: resource}, format: :json }
+    let(:private_resource_by_manager) { FactoryBot.create(:resource, :private, created_by_id: manager.id) }
+    let(:private_resource) { FactoryBot.create(:resource, :private) }
+    let(:requested_resource) { resource }
+    let(:resource) { FactoryBot.create(:resource) }
+    subject { get :show, params: {id: requested_resource}, format: :json }
 
     context "when not signed in" do
+      let(:requested_resource) { resource }
       it { expect(subject).to be_forbidden }
 
-      it "will not show draft resource" do
-        get :show, params: {id: draft_resource}, format: :json
-        expect(response).to be_forbidden
+      context "draft" do
+        let(:requested_resource) { draft_resource }
+
+        it "will not show draft resource" do
+          expect(subject).to be_forbidden
+        end
       end
     end
 
     context "when signed in" do
       context "as analyst" do
         context "will show resource" do
-          subject { get :show, params: {id: resource}, format: :json }
+          let(:requested_resource) { resource }
+
           before { sign_in analyst }
 
           it { expect(subject).to be_ok }
         end
 
         context "will not show draft resource" do
-          subject { get :show, params: {id: draft_resource}, format: :json }
+          let(:requested_resource) { draft_resource }
+
           before { sign_in analyst }
 
           it { expect(subject).to be_not_found }
+        end
+
+        context "as admin" do
+          before { sign_in admin }
+
+          it { expect(subject).to be_ok }
+        end
+
+        context "as manager" do
+          before { sign_in manager }
+
+          it { expect(subject).to be_ok }
+
+          context "who created will see" do
+            let(:requested_resource) { private_resource_by_manager }
+
+            it { expect(subject).to be_ok }
+          end
+
+          context "who didn't create won't see" do
+            let(:requested_resource) { private_resource }
+
+            it { expect(subject).to be_not_found }
+          end
         end
       end
     end

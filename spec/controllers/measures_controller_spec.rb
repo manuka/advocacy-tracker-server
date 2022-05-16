@@ -116,16 +116,40 @@ RSpec.describe MeasuresController, type: :controller do
   describe "Get show" do
     let(:measure) { FactoryBot.create(:measure) }
     let(:draft_measure) { FactoryBot.create(:measure, draft: true) }
-    subject { get :show, params: {id: measure}, format: :json }
+    let(:private_measure) { FactoryBot.create(:measure, :private) }
+    let(:private_measure_by_manager) { FactoryBot.create(:measure, :private, created_by_id: manager.id) }
+    let(:requested_resource) { measure }
+
+    subject { get :show, params: {id: requested_resource}, format: :json }
 
     context "when not signed in" do
       it { expect(subject).to be_forbidden }
     end
 
     context "when signed in" do
-      before { sign_in admin }
+      context "as admin" do
+        before { sign_in admin }
 
-      it { expect(subject).to be_ok }
+        it { expect(subject).to be_ok }
+      end
+
+      context "as manager" do
+        before { sign_in manager }
+
+        it { expect(subject).to be_ok }
+
+        context "who created will see" do
+          let(:requested_resource) { private_measure_by_manager }
+
+          it { expect(subject).to be_ok }
+        end
+
+        context "who didn't create won't see" do
+          let(:requested_resource) { private_measure }
+
+          it { expect(subject).to be_not_found }
+        end
+      end
     end
   end
 

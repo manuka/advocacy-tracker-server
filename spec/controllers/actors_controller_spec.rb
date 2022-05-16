@@ -75,16 +75,40 @@ RSpec.describe ActorsController, type: :controller do
   describe "Get show" do
     let(:actor) { FactoryBot.create(:actor) }
     let(:draft_actor) { FactoryBot.create(:actor, draft: true) }
-    subject { get :show, params: {id: actor}, format: :json }
+    let(:private_actor) { FactoryBot.create(:actor, :private) }
+    let(:private_actor_by_manager) { FactoryBot.create(:actor, :private, created_by_id: manager.id) }
+    let(:requested_resource) { actor }
+
+    subject { get :show, params: {id: requested_resource}, format: :json }
 
     context "when not signed in" do
       it { expect(subject).to be_forbidden }
     end
 
     context "when signed in" do
-      before { sign_in admin }
+      context "as admin" do
+        before { sign_in admin }
 
-      it { expect(subject).to be_ok }
+        it { expect(subject).to be_ok }
+      end
+
+      context "as manager" do
+        before { sign_in manager }
+
+        it { expect(subject).to be_ok }
+
+        context "who created will see" do
+          let(:requested_resource) { private_actor_by_manager }
+
+          it { expect(subject).to be_ok }
+        end
+
+        context "who didn't create won't see" do
+          let(:requested_resource) { private_actor }
+
+          it { expect(subject).to be_not_found }
+        end
+      end
     end
   end
 
