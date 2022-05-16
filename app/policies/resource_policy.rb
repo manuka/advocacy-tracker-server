@@ -9,7 +9,8 @@ class ResourcePolicy < ApplicationPolicy
       :status,
       :title,
       :resourcetype_id,
-      :url
+      :url,
+      :is_archive
     ]
   end
 end

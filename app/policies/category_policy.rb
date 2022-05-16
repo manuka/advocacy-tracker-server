@@ -2,6 +2,21 @@
 
 class CategoryPolicy < ApplicationPolicy
   def permitted_attributes
-    [:title, :parent_id, :short_title, :description, :url, :draft, :taxonomy_id, :manager_id, :order, :reference, :date, :user_only]
+    [
+      :title,
+      :parent_id,
+      :short_title,
+      :description,
+      :url,
+      :draft,
+      :taxonomy_id,
+      :manager_id,
+      :order,
+      :reference,
+      :date,
+      :user_only,
+      :is_archive
+    ]
+
   end
 end

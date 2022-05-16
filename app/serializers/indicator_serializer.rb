@@ -11,7 +11,8 @@ class IndicatorSerializer
     :start_date,
     :repeat,
     :end_date,
-    :private
+    :private,
+    :is_archive
   )
 
   set_type :indicators
