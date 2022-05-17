@@ -4,6 +4,6 @@ class PagePolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    [:title, :content, :menu_title, :draft, :order]
+    [:title, :content, :menu_title, :draft, :order, :private]
   end
 end

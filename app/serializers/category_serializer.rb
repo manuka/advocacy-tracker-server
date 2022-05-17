@@ -13,7 +13,8 @@ class CategorySerializer
     :manager_id,
     :date,
     :user_only,
-    :is_archive
+    :is_archive,
+    :private
   )
 
   set_type :categories
