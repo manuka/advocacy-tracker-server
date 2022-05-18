@@ -9,6 +9,14 @@ FactoryBot.define do
     title { "MyString" }
     url { "https://impactoss.org" }
 
+    trait :is_archive do
+      is_archive { true }
+    end
+
+    trait :not_is_archive do
+      is_archive { false }
+    end
+
     trait :not_private do
       private { false }
     end

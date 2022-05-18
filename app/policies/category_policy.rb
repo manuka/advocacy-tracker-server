@@ -15,9 +15,8 @@ class CategoryPolicy < ApplicationPolicy
       :reference,
       :date,
       :user_only,
-      :is_archive,
+      (:is_archive if @user.role?("admin")),
       :private
-    ]
-
+    ].compact
   end
 end

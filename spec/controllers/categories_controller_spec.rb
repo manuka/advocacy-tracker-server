@@ -38,6 +38,30 @@ RSpec.describe CategoriesController, type: :controller do
         end
       end
 
+      context "is_archive categories" do
+        let!(:category) { FactoryBot.create(:category, :not_is_archive) }
+        let!(:is_archive_category) { FactoryBot.create(:category, :is_archive) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will not see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "analyst will not see" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+      end
+
       context "private" do
         let!(:category) { FactoryBot.create(:category, :not_private) }
         let!(:private_category) { FactoryBot.create(:category, :private) }
@@ -112,19 +136,19 @@ RSpec.describe CategoriesController, type: :controller do
     end
 
     context "when signed in" do
-      subject do
-        post :create,
-          format: :json,
-          params: {
-            category: {
-              title: "test",
-              short_title: "bla",
-              description: "test",
-              target_date: "today",
-              taxonomy_id: taxonomy.id
-            }
+      let(:params) do
+        {
+          category: {
+            title: "test",
+            short_title: "bla",
+            description: "test",
+            target_date: "today",
+            taxonomy_id: taxonomy.id
           }
+        }
       end
+
+      subject { post :create, format: :json, params: params }
 
       it "will not allow a guest to create a category" do
         sign_in guest
@@ -134,6 +158,33 @@ RSpec.describe CategoriesController, type: :controller do
       it "will allow a manager to create a category" do
         sign_in manager
         expect(subject).to be_created
+      end
+
+      context "is_archive" do
+        let(:params) do
+          {
+            category: {
+              title: "test",
+              short_title: "bla",
+              description: "test",
+              target_date: "today",
+              taxonomy_id: taxonomy.id,
+              is_archive: true
+            }
+          }
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will record what manager created the category", versioning: true do
@@ -180,6 +231,27 @@ RSpec.describe CategoriesController, type: :controller do
       it "will allow a manager to update a category" do
         sign_in manager
         expect(subject).to be_ok
+      end
+
+      it "will allow a manager to update a category" do
+        sign_in manager
+        expect(subject).to be_ok
+      end
+
+      context "is_archive" do
+        subject do
+          put :update, format: :json, params: {id: category, category: {is_archive: true}}
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will reject and update where the last_updated_at is older than updated_at in the database" do

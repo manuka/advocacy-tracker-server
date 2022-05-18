@@ -230,7 +230,6 @@ class Seeds
     countrystatus.categories.create!(title: "Disputed")
     countrystatus.categories.create!(title: "Indeterminate")
     countrystatus.categories.create!(title: "Sovereign country")
-
   end
 
   def development_seeds!

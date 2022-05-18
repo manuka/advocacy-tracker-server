@@ -46,6 +46,30 @@ RSpec.describe MeasuresController, type: :controller do
         end
       end
 
+      context "is_archive measures" do
+        let!(:measure) { FactoryBot.create(:measure, :not_is_archive) }
+        let!(:is_archive_measure) { FactoryBot.create(:measure, :is_archive) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will not see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "analyst will not see" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+      end
+
       context "private" do
         let!(:measure) { FactoryBot.create(:measure, :not_private) }
         let!(:private_measure) { FactoryBot.create(:measure, :private) }
@@ -165,30 +189,30 @@ RSpec.describe MeasuresController, type: :controller do
       let(:recommendation) { FactoryBot.create(:recommendation) }
       let(:category) { FactoryBot.create(:category) }
       let(:measuretype) { FactoryBot.create(:measuretype) }
-
-      subject do
-        post :create,
-          format: :json,
-          params: {
-            measure: {
-              title: "test",
-              description: "test",
-              measuretype_id: measuretype.id,
-              target_date: "today"
-            }
+      let(:params) do
+        {
+          measure: {
+            title: "test",
+            description: "test",
+            measuretype_id: measuretype.id,
+            target_date: "today"
           }
-        # This is an example creating a new recommendation record in the post
-        # post :create,
-        #      format: :json,
-        #      params: {
-        #        measure: {
-        #          title: 'test',
-        #          description: 'test',
-        #          target_date: 'today',
-        #          recommendation_measures_attributes: [ { recommendation_attributes: { title: 'test 1', number: 1 } } ]
-        #        }
-        #      }
+        }
       end
+
+      subject { post :create, format: :json, params: params }
+
+      # This is an example creating a new recommendation record in the post
+      # post :create,
+      #      format: :json,
+      #      params: {
+      #        measure: {
+      #          title: 'test',
+      #          description: 'test',
+      #          target_date: 'today',
+      #          recommendation_measures_attributes: [ { recommendation_attributes: { title: 'test 1', number: 1 } } ]
+      #        }
+      #      }
 
       it "will not allow a guest to create a measure" do
         sign_in guest
@@ -208,6 +232,32 @@ RSpec.describe MeasuresController, type: :controller do
       it "will allow an admin to create a measure" do
         sign_in admin
         expect(subject).to be_created
+      end
+
+      context "is_archive" do
+        let(:params) do
+          {
+            measure: {
+              title: "test",
+              description: "test",
+              measuretype_id: measuretype.id,
+              target_date: "today",
+              is_archive: true
+            }
+          }
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will record what manager created the measure", versioning: true do
@@ -259,6 +309,22 @@ RSpec.describe MeasuresController, type: :controller do
       it "will allow an admin to update a measure" do
         sign_in admin
         expect(subject).to be_ok
+      end
+
+      context "is_archive" do
+        subject do
+          put :update, format: :json, params: {id: measure, measure: {is_archive: true}}
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will reject and update where the last_updated_at is older than updated_at in the database" do

@@ -19,7 +19,7 @@ class ActorPolicy < ApplicationPolicy
       :private,
       :title,
       :url,
-      :is_archive
-    ]
+      (:is_archive if @user.role?("admin"))
+    ].compact
   end
 end

@@ -2,7 +2,8 @@
 
 class IndicatorPolicy < ApplicationPolicy
   def permitted_attributes
-    [:title,
+    [
+      :title,
       :description,
       :draft,
       :manager_id,
@@ -12,8 +13,11 @@ class IndicatorPolicy < ApplicationPolicy
       :end_date,
       :reference,
       :private,
-      :is_archive,
-      measure_indicators_attributes: [:measure_id,
-        measure_attributes: [:id, :title, :description, :target_date, :draft]]]
+      (:is_archive if @user.role?("admin")),
+      measure_indicators_attributes: [
+        :measure_id,
+        measure_attributes: [:id, :title, :description, :target_date, :draft]
+      ]
+    ].compact
   end
 end

@@ -38,6 +38,30 @@ RSpec.describe IndicatorsController, type: :controller do
           expect(json["data"].length).to eq(2)
         end
       end
+
+      context "is_archive indicators" do
+        let!(:indicator) { FactoryBot.create(:indicator, :not_is_archive) }
+        let!(:is_archive_indicator) { FactoryBot.create(:indicator, :is_archive) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will not see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "analyst will not see" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+      end
     end
 
     context "filters" do
@@ -107,17 +131,17 @@ RSpec.describe IndicatorsController, type: :controller do
 
     context "when signed in" do
       let(:measure) { FactoryBot.create(:measure) }
-      subject do
-        post :create,
-          format: :json,
-          params: {
-            indicator: {
-              title: "test",
-              description: "test",
-              target_date: "today"
-            }
+      let(:params) do
+        {
+          indicator: {
+            title: "test",
+            description: "test",
+            target_date: "today"
           }
+        }
       end
+
+      subject { post :create, format: :json, params: params }
 
       it "will not allow a guest to create a indicator" do
         sign_in guest
@@ -127,6 +151,31 @@ RSpec.describe IndicatorsController, type: :controller do
       it "will allow a manager to create a indicator" do
         sign_in manager
         expect(subject).to be_created
+      end
+
+      context "is_archive" do
+        let(:params) do
+          {
+            indicator: {
+              title: "test",
+              description: "test",
+              target_date: "today",
+              is_archive: true
+            }
+          }
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will record what manager created the indicator", versioning: true do
@@ -168,6 +217,22 @@ RSpec.describe IndicatorsController, type: :controller do
       it "will allow a manager to update a indicator" do
         sign_in manager
         expect(subject).to be_ok
+      end
+
+      context "is_archive" do
+        subject do
+          put :update, format: :json, params: {id: indicator, indicator: {is_archive: true}}
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will reject an update where the last_updated_at is older than updated_at in the database" do

@@ -27,7 +27,7 @@ class MeasurePolicy < ApplicationPolicy
       :target_date,
       :title,
       :url,
-      :is_archive,
+      (:is_archive if @user.role?("admin")),
       measure_categories_attributes: [
         :category_id,
         category_attributes: [
@@ -50,6 +50,6 @@ class MeasurePolicy < ApplicationPolicy
           :title
         ]
       ]
-    ]
+    ].compact
   end
 end
