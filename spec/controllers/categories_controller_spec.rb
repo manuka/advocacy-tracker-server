@@ -38,6 +38,30 @@ RSpec.describe CategoriesController, type: :controller do
         end
       end
 
+      context "is_archive categories" do
+        let!(:category) { FactoryBot.create(:category, :not_is_archive) }
+        let!(:is_archive_category) { FactoryBot.create(:category, :is_archive) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will not see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "analyst will not see" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+      end
+
       context "private" do
         let!(:category) { FactoryBot.create(:category, :not_private) }
         let!(:private_category) { FactoryBot.create(:category, :private) }

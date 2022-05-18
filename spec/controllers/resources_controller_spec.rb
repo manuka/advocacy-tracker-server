@@ -38,6 +38,30 @@ RSpec.describe ResourcesController, type: :controller do
         end
       end
 
+      context "is_archive resources" do
+        let!(:resource) { FactoryBot.create(:resource, :not_is_archive) }
+        let!(:is_archive_resource) { FactoryBot.create(:resource, :is_archive) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will not see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "analyst will not see" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+      end
+
       context "private" do
         let!(:resource) { FactoryBot.create(:resource, :not_private) }
         let!(:private_resource) { FactoryBot.create(:resource, :private) }

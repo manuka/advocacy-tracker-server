@@ -38,6 +38,7 @@ class ApplicationPolicy
     def resolve_for_analyst
       analyst_scope = scope.all
       analyst_scope = analyst_scope.where(draft: false) if scope.column_names.include?("draft")
+      analyst_scope = analyst_scope.where(is_archive: false) if scope.column_names.include?("is_archive")
       analyst_scope = analyst_scope.where(private: false) if scope.column_names.include?("private")
 
       analyst_scope
@@ -50,6 +51,7 @@ class ApplicationPolicy
           .where(private: false)
           .or(manager_scope.where(created_by_id: user.id))
       end
+      manager_scope = manager_scope.where(is_archive: false) if scope.column_names.include?("is_archive")
       manager_scope
     end
 

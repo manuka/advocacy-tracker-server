@@ -46,6 +46,30 @@ RSpec.describe ActorsController, type: :controller do
         end
       end
 
+      context "is_archive actors" do
+        let!(:actor) { FactoryBot.create(:actor, :not_is_archive) }
+        let!(:is_archive_actor) { FactoryBot.create(:actor, :is_archive) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will not see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "analyst will not see" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(0)
+        end
+      end
+
       context "private" do
         let!(:actor) { FactoryBot.create(:actor, :not_private) }
         let!(:private_actor) { FactoryBot.create(:actor, :private) }

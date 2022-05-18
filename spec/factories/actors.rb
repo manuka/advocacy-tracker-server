@@ -10,8 +10,20 @@ FactoryBot.define do
     prefix { Faker::Name.prefix }
     title { Faker::Creature::Cat.registry }
 
+    trait :draft do
+      draft { true }
+    end
+
     trait :not_draft do
       draft { false }
+    end
+
+    trait :is_archive do
+      is_archive { true }
+    end
+
+    trait :not_is_archive do
+      is_archive { false }
     end
 
     trait :not_private do

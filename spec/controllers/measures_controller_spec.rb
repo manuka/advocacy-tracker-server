@@ -46,6 +46,30 @@ RSpec.describe MeasuresController, type: :controller do
         end
       end
 
+      context "is_archive measures" do
+        let!(:measure) { FactoryBot.create(:measure, :not_is_archive) }
+        let!(:is_archive_measure) { FactoryBot.create(:measure, :is_archive) }
+
+        it "admin will see" do
+          sign_in admin
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "manager will not see" do
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "analyst will not see" do
+          sign_in analyst
+
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+      end
+
       context "private" do
         let!(:measure) { FactoryBot.create(:measure, :not_private) }
         let!(:private_measure) { FactoryBot.create(:measure, :private) }
