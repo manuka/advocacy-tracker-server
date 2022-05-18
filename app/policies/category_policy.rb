@@ -18,6 +18,5 @@ class CategoryPolicy < ApplicationPolicy
       :is_archive,
       :private
     ]
-
   end
 end
