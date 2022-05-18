@@ -148,20 +148,18 @@ RSpec.describe ActorsController, type: :controller do
       let(:recommendation) { FactoryBot.create(:recommendation) }
       let(:category) { FactoryBot.create(:category) }
       let(:actortype) { FactoryBot.create(:actortype) }
-
-      subject do
-        post :create,
-          format: :json,
-          params: {
-            actor: {
-              code: "test",
-              title: "test",
-              description: "test",
-              actortype_id: actortype.id,
-              target_date: "today"
-            }
+      let(:params) do
+        {
+          actor: {
+            code: "test",
+            title: "test",
+            description: "test",
+            actortype_id: actortype.id,
+            target_date: "today"
           }
+        }
       end
+      subject { post :create, format: :json, params: params }
 
       it "will not allow a guest to create an actor" do
         sign_in guest
@@ -181,6 +179,33 @@ RSpec.describe ActorsController, type: :controller do
       it "will allow an admin to create an actor" do
         sign_in admin
         expect(subject).to be_created
+      end
+
+      context "is_archive" do
+        let(:params) do
+          {
+            actor: {
+              code: "test",
+              title: "test",
+              description: "test",
+              actortype_id: actortype.id,
+              target_date: "today",
+              is_archive: true
+            }
+          }
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will record what manager created the actor", versioning: true do
@@ -232,6 +257,22 @@ RSpec.describe ActorsController, type: :controller do
       it "will allow an admin to update an actor" do
         sign_in admin
         expect(subject).to be_ok
+      end
+
+      context "is_archive" do
+        subject do
+          put :update, format: :json, params: {id: actor, actor: {is_archive: true}}
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will reject and update where the last_updated_at is older than updated_at in the database" do

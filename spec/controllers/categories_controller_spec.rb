@@ -136,19 +136,19 @@ RSpec.describe CategoriesController, type: :controller do
     end
 
     context "when signed in" do
-      subject do
-        post :create,
-          format: :json,
-          params: {
-            category: {
-              title: "test",
-              short_title: "bla",
-              description: "test",
-              target_date: "today",
-              taxonomy_id: taxonomy.id
-            }
+      let(:params) do
+        {
+          category: {
+            title: "test",
+            short_title: "bla",
+            description: "test",
+            target_date: "today",
+            taxonomy_id: taxonomy.id
           }
+        }
       end
+
+      subject { post :create, format: :json, params: params }
 
       it "will not allow a guest to create a category" do
         sign_in guest
@@ -158,6 +158,33 @@ RSpec.describe CategoriesController, type: :controller do
       it "will allow a manager to create a category" do
         sign_in manager
         expect(subject).to be_created
+      end
+
+      context "is_archive" do
+        let(:params) do
+          {
+            category: {
+              title: "test",
+              short_title: "bla",
+              description: "test",
+              target_date: "today",
+              taxonomy_id: taxonomy.id,
+              is_archive: true
+            }
+          }
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will record what manager created the category", versioning: true do
@@ -204,6 +231,27 @@ RSpec.describe CategoriesController, type: :controller do
       it "will allow a manager to update a category" do
         sign_in manager
         expect(subject).to be_ok
+      end
+
+      it "will allow a manager to update a category" do
+        sign_in manager
+        expect(subject).to be_ok
+      end
+
+      context "is_archive" do
+        subject do
+          put :update, format: :json, params: {id: category, category: {is_archive: true}}
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will reject and update where the last_updated_at is older than updated_at in the database" do

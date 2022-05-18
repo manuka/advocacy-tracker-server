@@ -165,17 +165,16 @@ RSpec.describe ResourcesController, type: :controller do
     context "when signed in" do
       let(:taxonomy) { FactoryBot.create(:taxonomy) }
       let(:resourcetype) { FactoryBot.create(:resourcetype) }
-
-      subject do
-        post :create,
-          format: :json,
-          params: {
-            resource: {
-              title: "test",
-              resourcetype_id: resourcetype.id
-            }
+      let(:params) do
+        {
+          resource: {
+            title: "test",
+            resourcetype_id: resourcetype.id
           }
+        }
       end
+
+      subject { post :create, format: :json, params: params }
 
       it "will not allow a guest to create a resource" do
         sign_in guest
@@ -192,9 +191,33 @@ RSpec.describe ResourcesController, type: :controller do
         expect(subject).to be_created
       end
 
-      it "will not allow an admin to create a resource" do
+      it "will allow an admin to create a resource" do
         sign_in admin
         expect(subject).to be_created
+      end
+
+      context "is_archive" do
+        let(:params) do
+          {
+            resource: {
+              title: "test",
+              resourcetype_id: resourcetype.id,
+              is_archive: true
+            }
+          }
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will record which admin created the resource", versioning: true do
@@ -241,6 +264,22 @@ RSpec.describe ResourcesController, type: :controller do
       it "will allow an admin to update a resource" do
         sign_in admin
         expect(subject).to be_ok
+      end
+
+      context "is_archive" do
+        subject do
+          put :update, format: :json, params: {id: resource, resource: {is_archive: true}}
+        end
+
+        it "can't be set by manager" do
+          sign_in manager
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can be set by admin" do
+          sign_in admin
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        end
       end
 
       it "will reject and update where the last_updated_at is older than updated_at in the database" do
