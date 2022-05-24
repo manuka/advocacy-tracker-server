@@ -20,10 +20,11 @@ RSpec.describe Actor, type: :model do
     FactoryBot.create(:actor_measure, actor: actor)
     FactoryBot.create(:measure_actor, actor: actor)
     FactoryBot.create(:membership, member: actor, memberof: FactoryBot.create(:actor, actortype: FactoryBot.create(:actortype, has_members: true)))
+    FactoryBot.create(:user_actor, actor: actor)
 
     expect { actor.destroy }.to change {
-      [Actor.count, ActorCategory.count, ActorMeasure.count, MeasureActor.count, Membership.count]
-    }.from([2, 1, 1, 1, 1]).to([1, 0, 0, 0, 0])
+      [Actor.count, ActorCategory.count, ActorMeasure.count, MeasureActor.count, Membership.count, UserActor.count]
+    }.from([2, 1, 1, 1, 1, 1]).to([1, 0, 0, 0, 0, 0])
   end
 
   context "parent_id" do
