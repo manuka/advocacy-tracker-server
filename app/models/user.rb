@@ -19,6 +19,10 @@ class User < VersionedRecord
   has_many :user_categories, dependent: :destroy
   has_many :categories, through: :user_categories
   has_many :bookmarks, dependent: :destroy
+  has_many :user_actors, dependent: :destroy
+  has_many :actors, through: :user_actors
+  has_many :user_measures, dependent: :destroy
+  has_many :measures, through: :user_measures
 
   validates :email, presence: true
   validates :name, presence: true
