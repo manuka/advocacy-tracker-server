@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_16_082216) do
+ActiveRecord::Schema.define(version: 2022_06_28_135213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -219,6 +219,7 @@ ActiveRecord::Schema.define(version: 2022_05_16_082216) do
   create_table "measure_indicators", id: :serial, force: :cascade do |t|
     t.integer "measure_id"
     t.integer "indicator_id"
+    t.bigint "supportlevel_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "created_by_id"
