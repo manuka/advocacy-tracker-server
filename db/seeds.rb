@@ -26,22 +26,24 @@ class Seeds
   def base_seeds!
     # Set up user roles
     Role.create!(name: "admin", friendly_name: "Admin")
-    Role.create!(name: "manager", friendly_name: "Manager")
-    Role.create!(name: "analyst", friendly_name: "Analyst")
+    Role.create!(name: "manager", friendly_name: "Team Member")
+    Role.create!(name: "analyst", friendly_name: "Visitor")
 
     # set up Actor Types with taxonomies ########################################################
     # 1 Countries
     countries = Actortype.create!(
       title: "Country",
       has_members: true,
-      is_active: true
+      is_active: true,
+      is_target: true
     )
 
     # 2 Organisations
     orgs = Actortype.create!(
       title: "Organisation",
       has_members: true,
-      is_active: true
+      is_active: true,
+      is_target: true
     )
 
     # 3 Contacts (external)
@@ -54,46 +56,71 @@ class Seeds
     regions = Actortype.create!(
       title: "Region",
       has_members: true,
-      is_active: true
+      is_active: false,
+      is_target: true
     )
 
     # 5 Groups
     groups = Actortype.create!(
       title: "Group",
       has_members: true,
-      is_active: true
+      is_active: true,
+      is_target: true
     )
 
     # set up Activity Types with taxonomies ########################################################
     # 1 Expressions
     expressions = Measuretype.create!(
-      title: "Expression"
+      title: "Expression",
+      has_target: true,
+      has_parent: true
       # has_indicators: true,
     )
 
     # 2 Events
     events = Measuretype.create!(
-      title: "Event"
+      title: "Event",
+      has_target: true,
+      has_parent: true
     )
 
     # 3 Outreach plans
     outreachplans = Measuretype.create!(
-      title: "Outreach plan"
+      title: "Outreach plan",
+      has_target: true,
+      has_parent: true
     )
 
     # 4 Advocacy plans
     advocacyplans = Measuretype.create!(
-      title: "Advocacy plan"
+      title: "Advocacy plan",
+      has_target: true,
+      has_parent: true
     )
 
     # 5 Tasks (outreach, advocacy?)
     tasks = Measuretype.create!(
-      title: "Task"
+      title: "Task",
+      has_target: true,
+      has_parent: true
     )
 
     # 6 Interactions
     interactions = Measuretype.create!(
-      title: "Interaction"
+      title: "Interaction",
+      has_target: true,
+      has_parent: true
+    )
+
+    # set up Resource Types ########################################################
+    Resourcetype.create!(
+      title: "Reference"
+    )
+    Resourcetype.create!(
+      title: "Web"
+    )
+    Resourcetype.create!(
+      title: "Documents"
     )
 
     # Set up taxonomies ########################################################
@@ -103,8 +130,8 @@ class Seeds
       allow_multiple: false
     )
     ActortypeTaxonomy.create!(
-      taxonomy: countrystatus,
-      actortype: countries
+      taxonomy: countrystatus, #1
+      actortype: countries #1
     )
     # 2 Organisation sector
     orgsector = Taxonomy.create!(
@@ -112,8 +139,8 @@ class Seeds
       allow_multiple: false
     )
     ActortypeTaxonomy.create!(
-      taxonomy: orgsector,
-      actortype: orgs
+      taxonomy: orgsector, #2
+      actortype: orgs #2
     )
     # 3 Contact type aka "role"
     contacttype = Taxonomy.create!(
@@ -121,8 +148,8 @@ class Seeds
       allow_multiple: true
     )
     ActortypeTaxonomy.create!(
-      taxonomy: contacttype,
-      actortype: contacts
+      taxonomy: contacttype, # 3
+      actortype: contacts #3
     )
     # 4 Type of region
     regiontype = Taxonomy.create!(
@@ -130,8 +157,8 @@ class Seeds
       allow_multiple: true
     )
     ActortypeTaxonomy.create!(
-      taxonomy: regiontype,
-      actortype: regions
+      taxonomy: regiontype, #4
+      actortype: regions #4
     )
     # 5 type of group
     grouptype = Taxonomy.create!(
@@ -139,8 +166,8 @@ class Seeds
       allow_multiple: false
     )
     ActortypeTaxonomy.create!(
-      taxonomy: grouptype,
-      actortype: groups
+      taxonomy: grouptype, #5
+      actortype: groups #5
     )
     # 6 level of support
     supportlevel = Taxonomy.create!(
@@ -148,8 +175,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: supportlevel,
-      measuretype: expressions
+      taxonomy: supportlevel, #6
+      measuretype: expressions #1
     )
     # 7 type of expression
     expressiontype = Taxonomy.create!(
@@ -157,8 +184,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: expressiontype,
-      measuretype: expressions
+      taxonomy: expressiontype, #7
+      measuretype: expressions #1
     )
     # 8 tags (buzzwords)
     tags = Taxonomy.create!(
@@ -166,8 +193,8 @@ class Seeds
       allow_multiple: true
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: tags,
-      measuretype: expressions
+      taxonomy: tags, #8
+      measuretype: expressions #1
     )
     # 9 type of event
     eventtype = Taxonomy.create!(
@@ -175,8 +202,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: eventtype,
-      measuretype: events
+      taxonomy: eventtype, #9
+      measuretype: events #2
     )
     # 10 priority of plan
     priority = Taxonomy.create!(
@@ -184,12 +211,16 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: priority,
-      measuretype: outreachplans
+      taxonomy: priority, #10
+      measuretype: outreachplans #3
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: priority,
-      measuretype: advocacyplans
+      taxonomy: priority, #10
+      measuretype: advocacyplans #4
+    )
+    MeasuretypeTaxonomy.create!(
+      taxonomy: priority, #10
+      measuretype: tasks #5
     )
     # 11 task status
     status = Taxonomy.create!(
@@ -197,8 +228,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: status,
-      measuretype: tasks
+      taxonomy: status, #11
+      measuretype: tasks #5
     )
     # 12 interaction type
     interactiontype = Taxonomy.create!(
@@ -206,30 +237,64 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: interactiontype,
-      measuretype: interactions
+      taxonomy: interactiontype, #12
+      measuretype: interactions #6
+    )
+    # 13 interaction type
+    authority = Taxonomy.create!(
+      title: "Authority",
+      allow_multiple: false
+    )
+    MeasuretypeTaxonomy.create!(
+      taxonomy: authority, #13
+      measuretype: expressions #1
     )
 
     # Set up categories ########################################################
     # Convention status
     # convstatus.categories.create!(title: "Signed")
 
-    # Group type taxonomy
-    grouptype.categories.create!(title: "Intergovernmental")
-    grouptype.categories.create!(title: "Mixed")
+    # country status taxonomy #1
+    countrystatus.categories.create!(title: "1 - Champion")
+    countrystatus.categories.create!(title: "2 - Like-Minded")
+    countrystatus.categories.create!(title: "3 - Positive")
+    countrystatus.categories.create!(title: "4 - Skeptical")
+    countrystatus.categories.create!(title: "5 - Opponent")
 
-    # Org sector taxonomy
+    # Org sector taxonomy #2
     orgsector.categories.create!(title: "Civil society")
     orgsector.categories.create!(title: "Private sector")
     orgsector.categories.create!(title: "Science & research")
     orgsector.categories.create!(title: "Public sector")
+    orgsector.categories.create!(title: "Intergovernmental organisations")
 
-    # country status taxonomy
-    countrystatus.categories.create!(title: "Country")
-    countrystatus.categories.create!(title: "Dependency")
-    countrystatus.categories.create!(title: "Disputed")
-    countrystatus.categories.create!(title: "Indeterminate")
-    countrystatus.categories.create!(title: "Sovereign country")
+    # Contact type taxonomy #3
+    contacttype.categories.create!(title: "Chief Administrative Secretary")
+    contacttype.categories.create!(title: "Acting Director General")
+    contacttype.categories.create!(title: "Counsellor")
+    contacttype.categories.create!(title: "Secretary of State")
+    contacttype.categories.create!(title: "Minister")
+    contacttype.categories.create!(title: "Director")
+    contacttype.categories.create!(title: "Government Representative")
+    contacttype.categories.create!(title: "Deputy Permanent Representative")
+    contacttype.categories.create!(title: "Deputy Director")
+    contacttype.categories.create!(title: "Corporate Representative")
+    contacttype.categories.create!(title: "First Secretary")
+    contacttype.categories.create!(title: "Ambassador")
+    contacttype.categories.create!(title: "Permanent Representative")
+    contacttype.categories.create!(title: "Academics")
+    contacttype.categories.create!(title: "Head of Delegation INC")
+    contacttype.categories.create!(title: "Deputy Director General")
+    contacttype.categories.create!(title: "INC Focal Point")
+
+    # Region type taxonomy #4
+    regiontype.categories.create!(title: "Subregion")
+    regiontype.categories.create!(title: "Region")
+
+    # Group type taxonomy #5
+    grouptype.categories.create!(title: "Intergovernmental")
+    grouptype.categories.create!(title: "Mixed")
+
   end
 
   def development_seeds!
