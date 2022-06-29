@@ -18,6 +18,9 @@ class Actor < VersionedRecord
   has_many :measure_actors, dependent: :destroy
   has_many :passive_measures, through: :measure_actors
 
+  has_many :user_actors, dependent: :destroy
+  has_many :users, through: :user_actors
+
   validates :title, presence: true
   validate :different_parent, :not_own_descendant
 

@@ -63,18 +63,32 @@ RSpec.describe Measure, type: :model do
       FactoryBot.create(:measure_indicator, measure: measure)
       FactoryBot.create(:actor_measure, measure: measure)
       FactoryBot.create(:measure_actor, measure: measure)
+      FactoryBot.create(:measure_measure, measure: measure)
+      FactoryBot.create(:measure_resource, measure: measure)
       FactoryBot.create(:recommendation_measure, measure: measure)
+      FactoryBot.create(:user_measure, measure: measure)
 
       expect { measure.destroy }.to change {
         [
           Measure.count,
           MeasureCategory.count,
           MeasureIndicator.count,
+          MeasureMeasure.count,
+          MeasureResource.count,
           ActorMeasure.count,
           MeasureActor.count,
-          RecommendationMeasure.count
+          RecommendationMeasure.count,
+          UserMeasure.count
         ]
-      }.from([1, 1, 1, 1, 1, 1]).to([0, 0, 0, 0, 0, 0])
+      }.from([2, 1, 1, 1, 1, 1, 1, 1, 1]).to([1, 0, 0, 0, 0, 0, 0, 0, 0])
+    end
+
+    it "is expected to cascade destroy other_measure_measures relationships" do
+      measure_measure = FactoryBot.create(:measure_measure)
+
+      expect { measure_measure.other_measure.destroy }.to change {
+        Measure.count
+      }.from(2).to(1)
     end
   end
 end
