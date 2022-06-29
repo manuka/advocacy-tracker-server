@@ -174,10 +174,12 @@ class Seeds
       title: "Level of support",
       allow_multiple: false
     )
-    MeasuretypeTaxonomy.create!(
-      taxonomy: supportlevel, #6
-      measuretype: expressions #1
-    )
+    # MeasuretypeTaxonomy.create!(
+    #   taxonomy: supportlevel, #6
+    #   measuretype: expressions #1
+    # )
+    # no longer applied see issue #43
+
     # 7 type of expression
     expressiontype = Taxonomy.create!(
       title: "Form of expression",
@@ -240,7 +242,7 @@ class Seeds
       taxonomy: interactiontype, #12
       measuretype: interactions #6
     )
-    # 13 interaction type
+    # 13 authority
     authority = Taxonomy.create!(
       title: "Authority",
       allow_multiple: false
@@ -295,6 +297,46 @@ class Seeds
     grouptype.categories.create!(title: "Intergovernmental")
     grouptype.categories.create!(title: "Mixed")
 
+    # Expression type taxonomy #7
+    expressiontype.categories.create!(title: "Plenary statement")
+    expressiontype.categories.create!(title: "Position paper")
+    expressiontype.categories.create!(title: "Bilateral")
+    expressiontype.categories.create!(title: "EU - NGO meeting")
+    expressiontype.categories.create!(title: "Forum Communiqué")
+    expressiontype.categories.create!(title: " Breakout group")
+
+    # Event type taxonomy #9
+    eventtype.categories.create!(title: "State-ledevent")
+    eventtype.categories.create!(title: "Hybrid")
+    eventtype.categories.create!(title: "UNEP-led event")
+    eventtype.categories.create!(title: "WWF-led event")
+    eventtype.categories.create!(title: "Digital")
+
+    # Priority taxonomy #10
+    priority.categories.create!(title: "1 - High priority")
+    priority.categories.create!(title: "2 - Normal priority")
+    priority.categories.create!(title: "3 - Low priority")
+
+    # Status taxonomy #11
+    status.categories.create!(title: "1 - In preparation")
+    status.categories.create!(title: "2 - In progress")
+    status.categories.create!(title: "3 - Completed")
+
+    # Interaction type taxonomy #12
+    interactiontype.categories.create!(title: "In person")
+    interactiontype.categories.create!(title: "Phone")
+    interactiontype.categories.create!(title: "Email")
+    interactiontype.categories.create!(title: "Online call")
+    interactiontype.categories.create!(title: "Letter")
+    interactiontype.categories.create!(title: "Online meeting chat ")
+    interactiontype.categories.create!(title: "Whatsapp Chat")
+
+    # Authority taxonomy #13
+    authority.categories.create!(title: "1 - Official")
+    authority.categories.create!(title: "2 - Inofficial")
+    authority.categories.create!(title: "3 - Own assessment")
+    authority.categories.create!(title: "4 Third party assessment")
+    
   end
 
   def development_seeds!
