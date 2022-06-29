@@ -3,6 +3,7 @@
 class IndicatorPolicy < ApplicationPolicy
   def permitted_attributes
     [
+      :code,
       :title,
       :description,
       :draft,

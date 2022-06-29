@@ -2,6 +2,7 @@ class IndicatorSerializer
   include FastVersionedSerializer
 
   attributes(
+    :code,
     :title,
     :description,
     :reference,
