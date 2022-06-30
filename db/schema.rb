@@ -222,6 +222,7 @@ ActiveRecord::Schema.define(version: 2022_06_29_164800) do
   create_table "measure_indicators", id: :serial, force: :cascade do |t|
     t.integer "measure_id"
     t.integer "indicator_id"
+    t.bigint "supportlevel_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "created_by_id"
