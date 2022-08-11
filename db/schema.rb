@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_06_29_164800) do
+ActiveRecord::Schema.define(version: 2022_08_11_081635) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -121,8 +121,8 @@ ActiveRecord::Schema.define(version: 2022_06_29_164800) do
     t.integer "parent_id"
     t.date "date"
     t.integer "created_by_id"
-    t.boolean "is_archive", default: false
     t.boolean "private", default: false
+    t.boolean "is_archive", default: false
     t.index ["draft"], name: "index_categories_on_draft"
     t.index ["manager_id"], name: "index_categories_on_manager_id"
     t.index ["taxonomy_id"], name: "index_categories_on_taxonomy_id"
@@ -172,7 +172,6 @@ ActiveRecord::Schema.define(version: 2022_06_29_164800) do
 
   create_table "indicators", id: :serial, force: :cascade do |t|
     t.text "title", null: false
-    t.string "code"
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -185,8 +184,9 @@ ActiveRecord::Schema.define(version: 2022_06_29_164800) do
     t.string "reference"
     t.integer "updated_by_id"
     t.integer "created_by_id"
-    t.boolean "is_archive", default: false
     t.boolean "private", default: false
+    t.boolean "is_archive", default: false
+    t.string "code"
     t.index ["created_at"], name: "index_indicators_on_created_at"
     t.index ["draft"], name: "index_indicators_on_draft"
     t.index ["manager_id"], name: "index_indicators_on_manager_id"
@@ -222,10 +222,10 @@ ActiveRecord::Schema.define(version: 2022_06_29_164800) do
   create_table "measure_indicators", id: :serial, force: :cascade do |t|
     t.integer "measure_id"
     t.integer "indicator_id"
-    t.bigint "supportlevel_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "created_by_id"
+    t.bigint "supportlevel_id"
     t.index ["measure_id", "indicator_id"], name: "index_measure_indicators_on_measure_id_and_indicator_id", unique: true
   end
 
@@ -285,8 +285,9 @@ ActiveRecord::Schema.define(version: 2022_06_29_164800) do
     t.string "status_lbs_protocol"
     t.decimal "amount"
     t.string "amount_comment"
-    t.boolean "is_archive", default: false
     t.boolean "private", default: false
+    t.boolean "is_archive", default: false
+    t.boolean "notifications", default: true
     t.index ["draft"], name: "index_measures_on_draft"
     t.index ["measuretype_id"], name: "index_measures_on_measuretype_id"
     t.index ["parent_id"], name: "index_measures_on_parent_id"

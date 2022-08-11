@@ -14,6 +14,7 @@ class MeasureSerializer
     :has_reference_landbased_ml,
     :indicator_summary,
     :measuretype_id,
+    :notifications,
     :outcome,
     :parent_id,
     :private,
