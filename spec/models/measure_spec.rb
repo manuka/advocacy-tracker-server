@@ -12,6 +12,10 @@ RSpec.describe Measure, type: :model do
     expect(subject.private).to eq(false)
   end
 
+  it "is expected to default notifications to true" do
+    expect(subject.notifications).to eq(true)
+  end
+
   context "parent_id" do
     subject do
       described_class.create(
