@@ -18,3 +18,5 @@ en:
   user_measure_mailer:
     created:
       subject: New measure assigned to you
+    published:
+      subject: A measure assigned to you has been published
