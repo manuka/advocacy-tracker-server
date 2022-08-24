@@ -17,6 +17,28 @@ RSpec.describe UserMeasureMailer, type: :mailer do
       end
     end
 
+    describe "with an is_archive measure" do
+      let(:measure) { FactoryBot.create(:measure, :is_archive) }
+
+      it "does not send an email" do
+        expect(mail.body).to be_blank
+        expect(mail.from).to be_nil
+        expect(mail.subject).to be_nil
+        expect(mail.to).to be_nil
+      end
+    end
+
+    describe "with a measure that has notifications disabled" do
+      let(:measure) { FactoryBot.create(:measure, notifications: false) }
+
+      it "does not send an email" do
+        expect(mail.body).to be_blank
+        expect(mail.from).to be_nil
+        expect(mail.subject).to be_nil
+        expect(mail.to).to be_nil
+      end
+    end
+
     it "renders the headers" do
       expect(mail.subject).to eq(I18n.t("user_measure_mailer.created.subject"))
       expect(mail.to).to eq([user_measure.user.email])
