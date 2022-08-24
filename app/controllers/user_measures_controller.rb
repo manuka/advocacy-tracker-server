@@ -21,6 +21,7 @@ class UserMeasuresController < ApplicationController
     authorize @user_measure
 
     if @user_measure.save
+      UserMeasureMailer.created(@user_measure).deliver_later
       render json: serialize(@user_measure), status: :created, location: @user_measure
     else
       render json: @user_measure.errors, status: :unprocessable_entity
