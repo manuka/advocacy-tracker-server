@@ -38,7 +38,9 @@ class MeasuresController < ApplicationController
     if @measure.update!(permitted_attributes(@measure))
       if originally_draft && !@measure.draft?
         @measure.user_measures.each do |user_measure|
-          UserMeasureMailer.published(user_measure).deliver_later if user_measure.notify?
+          if user_measure.user.id != current_user.id && user_measure.notify?
+            UserMeasureMailer.published(user_measure).deliver_now
+          end
         end
       end
 

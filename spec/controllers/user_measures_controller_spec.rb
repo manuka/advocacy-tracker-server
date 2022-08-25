@@ -54,6 +54,37 @@ RSpec.describe UserMeasuresController, type: :controller do
         expect(subject).to be_created
       end
 
+      context "with measure notifications disabled" do
+        let(:measure) { FactoryBot.create(:measure, notifications: false) }
+
+        it "will not send a notification email" do
+          sign_in manager
+          expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+        end
+      end
+
+      context "with measure notifications enabled" do
+        let(:measure) { FactoryBot.create(:measure, notifications: true) }
+
+        context "when the user is the creator" do
+          let(:user) { manager }
+
+          it "will not send a notification email" do
+            sign_in manager
+            expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+          end
+        end
+
+        context "when the user is not the creator" do
+          it "will send a notification email to the user" do
+            sign_in manager
+            expect { subject }.to change { ActionMailer::Base.deliveries.count }
+            expect(ActionMailer::Base.deliveries.last.to).to eq [user.email]
+            expect(ActionMailer::Base.deliveries.last.subject).to eq I18n.t(:subject, scope: [:user_measure_mailer, :created])
+          end
+        end
+      end
+
       it "will return an error if params are incorrect" do
         sign_in manager
         post :create, format: :json, params: {user_measure: {description: "desc only", taxonomy_id: 999}}

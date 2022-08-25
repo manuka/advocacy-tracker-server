@@ -21,8 +21,8 @@ class UserMeasuresController < ApplicationController
     authorize @user_measure
 
     if @user_measure.save
-      if @user_measure.user.id != created_by_id && @user_measure.notify?
-        UserMeasureMailer.created(@user_measure).deliver_later
+      if @user_measure.user.id != current_user.id && @user_measure.notify?
+        UserMeasureMailer.created(@user_measure).deliver_now
       end
 
       render json: serialize(@user_measure), status: :created, location: @user_measure
