@@ -7,6 +7,7 @@ class UserMeasureMailer < ApplicationMailer
   def created(user_measure)
     return unless user_measure.notify?
 
+    @measure_id = user_measure.measure_id
     @name = user_measure.user.name
     @title = user_measure.measure.title
 
@@ -21,6 +22,7 @@ class UserMeasureMailer < ApplicationMailer
   def published(user_measure)
     return unless user_measure.notify?
 
+    @measure_id = user_measure.measure_id
     @name = user_measure.user.name
     @title = user_measure.measure.title
 
