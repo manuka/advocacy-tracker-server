@@ -16,10 +16,26 @@ RSpec.describe MeasureCategory, type: :model do
     expect(measure_category.errors[:measure_id]).to include("must have the category's taxonomy enabled for its measuretype")
   end
 
-  it "works when the category's taxonomy is enabled for its measuretype" do
-    FactoryBot.create(:measuretype_taxonomy, measuretype: measure.measuretype, taxonomy: category.taxonomy)
+  context "when the category's taxonomy is enabled for its measuretype" do
+    let!(:measuretype_taxonomy) { FactoryBot.create(:measuretype_taxonomy, measuretype: measure.measuretype, taxonomy: category.taxonomy) }
 
-    measure_category = described_class.create(category: category, measure: measure)
-    expect(measure_category).to be_valid
+    subject { described_class.create(category: category, measure: measure) }
+
+    it "works" do
+      expect(subject).to be_valid
+    end
+
+    it "create sets the relationship_updated_at on the measure" do
+      expect { subject }.to change { measure.reload.relationship_updated_at }
+    end
+
+    it "update sets the relationship_updated_at on the measure" do
+      subject
+      expect { subject.touch }.to change { measure.reload.relationship_updated_at }
+    end
+
+    it "destroy sets the relationship_updated_at on the measure" do
+      expect { subject.destroy }.to change { measure.reload.relationship_updated_at }
+    end
   end
 end

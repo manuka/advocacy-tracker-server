@@ -14,4 +14,37 @@ RSpec.describe MeasureMeasure, type: :model do
     expect(measure_measure).to be_invalid
     expect(measure_measure.errors[:measure]).to include("can't be the same as other_measure")
   end
+
+  context "with an other_measure and a measure" do
+    let(:other_measure) { FactoryBot.create(:measure) }
+    let(:measure) { FactoryBot.create(:measure) }
+
+    subject { described_class.create(other_measure: other_measure, measure: measure) }
+
+    it "create sets the relationship_updated_at on the other_measure" do
+      expect { subject }.to change { other_measure.reload.relationship_updated_at }
+    end
+
+    it "create sets the relationship_updated_at on the measure" do
+      expect { subject }.to change { measure.reload.relationship_updated_at }
+    end
+
+    it "update sets the relationship_updated_at on the other_measure" do
+      subject
+      expect { subject.touch }.to change { other_measure.reload.relationship_updated_at }
+    end
+
+    it "update sets the relationship_updated_at on the measure" do
+      subject
+      expect { subject.touch }.to change { measure.reload.relationship_updated_at }
+    end
+
+    it "destroy sets the relationship_updated_at on the other_measure" do
+      expect { subject.destroy }.to change { other_measure.reload.relationship_updated_at }
+    end
+
+    it "destroy sets the relationship_updated_at on the measure" do
+      expect { subject.destroy }.to change { measure.reload.relationship_updated_at }
+    end
+  end
 end
