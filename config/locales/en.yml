@@ -15,3 +15,6 @@ en:
       subject: Indicator progress report is due
     overdue:
       subject: Indicator progress report is overdue
+  user_measure_mailer:
+    task_updated:
+      subject: Task updated

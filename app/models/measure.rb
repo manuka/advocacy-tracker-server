@@ -44,7 +44,7 @@ class Measure < VersionedRecord
   )
 
   def notify?
-    task? && !draft?
+    task? && !draft? && notifications?
   end
 
   def task?
