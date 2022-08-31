@@ -21,4 +21,23 @@ RSpec.describe ActorCategory, type: :model do
     actor_category = described_class.create(category: category, actor: actor)
     expect(actor_category).to be_valid
   end
+
+  context "with an actor and a category" do
+    let!(:taxonomy) { FactoryBot.create(:actortype_taxonomy, actortype: actor.actortype, taxonomy: category.taxonomy) }
+
+    subject { described_class.create(actor: actor, category: category) }
+
+    it "create sets the relationship_updated_at on the actor" do
+      expect { subject }.to change { actor.reload.relationship_updated_at }
+    end
+
+    it "update sets the relationship_updated_at on the actor" do
+      subject
+      expect { subject.touch }.to change { actor.reload.relationship_updated_at }
+    end
+
+    it "destroy sets the relationship_updated_at on the actor" do
+      expect { subject.destroy }.to change { actor.reload.relationship_updated_at }
+    end
+  end
 end

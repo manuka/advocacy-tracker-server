@@ -21,4 +21,37 @@ RSpec.describe ActorMeasure, type: :model do
     expect(actor_measure).to be_invalid
     expect(actor_measure.errors[:actor]).to(include("actor's actortype is not active"))
   end
+
+  context "with an actor and a measure" do
+    let(:actor) { FactoryBot.create(:actor) }
+    let(:measure) { FactoryBot.create(:measure) }
+
+    subject { described_class.create(actor: actor, measure: measure) }
+
+    it "create sets the relationship_updated_at on the actor" do
+      expect { subject }.to change { actor.reload.relationship_updated_at }
+    end
+
+    it "create sets the relationship_updated_at on the measure" do
+      expect { subject }.to change { measure.reload.relationship_updated_at }
+    end
+
+    it "update sets the relationship_updated_at on the actor" do
+      subject
+      expect { subject.touch }.to change { actor.reload.relationship_updated_at }
+    end
+
+    it "update sets the relationship_updated_at on the measure" do
+      subject
+      expect { subject.touch }.to change { measure.reload.relationship_updated_at }
+    end
+
+    it "destroy sets the relationship_updated_at on the actor" do
+      expect { subject.destroy }.to change { actor.reload.relationship_updated_at }
+    end
+
+    it "destroy sets the relationship_updated_at on the measure" do
+      expect { subject.destroy }.to change { measure.reload.relationship_updated_at }
+    end
+  end
 end
