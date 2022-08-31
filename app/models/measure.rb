@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Measure < VersionedRecord
+  TASK_MEASURETYPE_ID = 5
+
   has_many :recommendation_measures, inverse_of: :measure, dependent: :destroy
   has_many :measure_categories, inverse_of: :measure, dependent: :destroy
   has_many :measure_indicators, inverse_of: :measure, dependent: :destroy
@@ -40,6 +42,14 @@ class Measure < VersionedRecord
     :not_own_descendant,
     :parent_id_allowed_by_measuretype
   )
+
+  def notify?
+    task? && !draft?
+  end
+
+  def task?
+    measuretype_id == TASK_MEASURETYPE_ID
+  end
 
   private
 
