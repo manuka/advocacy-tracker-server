@@ -147,7 +147,7 @@ RSpec.describe ProgressReportsController, type: :controller do
         expect(subject).to be_ok
       end
 
-      it "will reject and update where the last_updated_at is older than updated_at in the database" do
+      it "will reject an update where the last_updated_at is older than updated_at in the database" do
         sign_in user
         progress_report_get = get :show, params: {id: progress_report_with_admin}, format: :json
         json = JSON.parse(progress_report_get.body)

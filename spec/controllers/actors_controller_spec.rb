@@ -275,7 +275,7 @@ RSpec.describe ActorsController, type: :controller do
         end
       end
 
-      it "will reject and update where the last_updated_at is older than updated_at in the database" do
+      it "will reject an update where the last_updated_at is older than updated_at in the database" do
         sign_in manager
         actor_get = get :show, params: {id: actor}, format: :json
         json = JSON.parse(actor_get.body)

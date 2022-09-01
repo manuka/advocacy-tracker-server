@@ -43,12 +43,12 @@ class Measure < VersionedRecord
     :parent_id_allowed_by_measuretype
   )
 
-  def notify?
-    task? && !draft? && !is_archive && notifications?
-  end
-
   def task?
     measuretype_id == TASK_MEASURETYPE_ID
+  end
+
+  def self.notifiable_attribute_names
+    Measure.attribute_names - %w[draft is_archive]
   end
 
   private

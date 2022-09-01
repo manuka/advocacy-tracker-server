@@ -282,7 +282,7 @@ RSpec.describe ResourcesController, type: :controller do
         end
       end
 
-      it "will reject and update where the last_updated_at is older than updated_at in the database" do
+      it "will reject an update where the last_updated_at is older than updated_at in the database" do
         sign_in admin
         resource_get = get :show, params: {id: resource}, format: :json
         json = JSON.parse(resource_get.body)

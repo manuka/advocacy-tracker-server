@@ -205,7 +205,7 @@ RSpec.describe PagesController, type: :controller do
         expect(subject).to be_ok
       end
 
-      it "will reject and update where the last_updated_at is older than updated_at in the database" do
+      it "will reject an update where the last_updated_at is older than updated_at in the database" do
         sign_in admin
         page_get = get :show, params: {id: page}, format: :json
         json = JSON.parse(page_get.body)

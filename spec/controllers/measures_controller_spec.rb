@@ -9,7 +9,7 @@ RSpec.describe MeasuresController, type: :controller do
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
 
-  describe "Get index" do
+  describe "GET index" do
     subject { get :index, format: :json }
 
     context "when not signed in" do
@@ -137,7 +137,7 @@ RSpec.describe MeasuresController, type: :controller do
     end
   end
 
-  describe "Get show" do
+  describe "GET show" do
     let(:measure) { FactoryBot.create(:measure) }
     let(:draft_measure) { FactoryBot.create(:measure, draft: true) }
     let(:private_measure) { FactoryBot.create(:measure, :private) }
@@ -177,7 +177,7 @@ RSpec.describe MeasuresController, type: :controller do
     end
   end
 
-  describe "Post create" do
+  describe "POST create" do
     context "when not signed in" do
       it "not allow creating a measure" do
         post :create, format: :json, params: {measure: {title: "test", description: "test", target_date: "today"}}
@@ -311,6 +311,86 @@ RSpec.describe MeasuresController, type: :controller do
         expect(subject).to be_ok
       end
 
+      context "with a successful update to a task measure" do
+        let(:measure) { FactoryBot.create(:measure, notifications: true) }
+        let!(:user_measure) { FactoryBot.create(:user_measure, user: manager, measure: measure) }
+
+        before do
+          allow_any_instance_of(Measure).to receive(:task?).and_return(true)
+          sign_in admin
+        end
+
+        %w[
+          amount_comment
+          amount
+          code
+          comment
+          date_comment
+          description
+          has_reference_landbased_ml
+          indicator_summary
+          outcome
+          private
+          reference_landbased_ml
+          reference_ml
+          status_comment
+          status_lbs_protocol
+          target_comment
+          target_date_comment
+          target_date
+          title
+          url
+        ].each do |attr|
+          context "when the task is published" do
+            let(:measure) { FactoryBot.create(:measure, :published, notifications: true) }
+
+            it "notifies the user of an update to #{attr}" do
+              expect {
+                put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
+              }.to change { ActionMailer::Base.deliveries.count }.by(1)
+            end
+          end
+
+          context "when the task is draft" do
+            let(:measure) { FactoryBot.create(:measure, :draft, notifications: true) }
+
+            it "does not notify the user of an update to #{attr}" do
+              expect {
+                put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
+              }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+            end
+          end
+
+          context "when the task is archived" do
+            let(:measure) { FactoryBot.create(:measure, :is_archive, notifications: true) }
+
+            it "does not notify the user of an update to #{attr}" do
+              expect {
+                put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
+              }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+            end
+
+            context "and is updated to not archived" do
+              it "does notify the user of an update to #{attr}" do
+                expect {
+                  put :update, format: :json, params: {id: measure, measure: {attr => "test", :is_archive => false}}
+                }.to change { ActionMailer::Base.deliveries.count }.by(1)
+              end
+            end
+          end
+
+          context "when the task is updated from draft" do
+            let(:measure) { FactoryBot.create(:measure, :draft, notifications: true) }
+
+            it "does not notify the user of an update to #{attr}" do
+              expect {
+                put :update, format: :json, params: {id: measure, measure: {attr => "test", :draft => false}}
+              }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+            end
+          end
+        end
+      end
+
       context "is_archive" do
         subject do
           put :update, format: :json, params: {id: measure, measure: {is_archive: true}}
@@ -327,7 +407,7 @@ RSpec.describe MeasuresController, type: :controller do
         end
       end
 
-      it "will reject and update where the last_updated_at is older than updated_at in the database" do
+      it "will reject an update where the last_updated_at is older than updated_at in the database" do
         sign_in manager
         measure_get = get :show, params: {id: measure}, format: :json
         json = JSON.parse(measure_get.body)
@@ -372,7 +452,7 @@ RSpec.describe MeasuresController, type: :controller do
     end
   end
 
-  describe "Delete destroy" do
+  describe "DELETE destroy" do
     let(:measure) { FactoryBot.create(:measure) }
     subject { delete :destroy, format: :json, params: {id: measure} }
 

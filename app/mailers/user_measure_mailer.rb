@@ -5,8 +5,6 @@ class UserMeasureMailer < ApplicationMailer
   #   en.user_measure_mailer.task_updated.subject
   #
   def task_updated(user_measure)
-    return unless user_measure.measure.notify?
-
     @measure_id = user_measure.measure_id
     @name = user_measure.user.name
     @title = user_measure.measure.title
