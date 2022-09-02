@@ -12,7 +12,7 @@ class ActorMeasure < VersionedRecord
   end
 
   def set_relationship_updated_at
-    actor.update_column(:relationship_updated_at, Time.zone.now) if actor && !actor.destroyed?
-    measure.update_column(:relationship_updated_at, Time.zone.now) if measure && !measure.destroyed?
+    actor.update(relationship_updated_at: Time.zone.now) if actor && !actor.destroyed?
+    measure.update(relationship_updated_at: Time.zone.now) if measure && !measure.destroyed?
   end
 end

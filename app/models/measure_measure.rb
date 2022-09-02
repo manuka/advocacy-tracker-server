@@ -17,7 +17,7 @@ class MeasureMeasure < VersionedRecord
   end
 
   def set_relationship_updated_at
-    measure.update_column(:relationship_updated_at, Time.zone.now) if measure && !measure.destroyed?
-    other_measure.update_column(:relationship_updated_at, Time.zone.now) if other_measure && !other_measure.destroyed?
+    measure.update(relationship_updated_at: Time.zone.now) if measure && !measure.destroyed?
+    other_measure.update(relationship_updated_at: Time.zone.now) if other_measure && !other_measure.destroyed?
   end
 end

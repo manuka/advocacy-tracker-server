@@ -35,10 +35,8 @@ class MeasuresController < ApplicationController
       return render json: '{"error":"Record outdated"}', status: :unprocessable_entity
     end
 
-    @measure.assign_attributes(permitted_attributes(@measure))
-    notify = notify?(@measure)
-    if @measure.save!
-      send_measure_update_notification!(@measure) if notify
+    if @measure.update!(permitted_attributes(@measure))
+      @measure.send_task_updated_notifications!(user_id: current_user.id)
 
       set_and_authorize_measure
       render json: serialize(@measure)
@@ -61,22 +59,6 @@ class MeasuresController < ApplicationController
       Indicator.find(params[:indicator_id]).measures
     else
       Measure
-    end
-  end
-
-  def notify?(measure)
-    measure.task? &&
-      measure.notifications? &&
-      (!measure.draft? && !measure.draft_changed?) &&
-      (!measure.is_archive || measure.is_archive_changed?) &&
-      (measure.changed_attributes.keys & Measure.notifiable_attribute_names).any?
-  end
-
-  def send_measure_update_notification!(measure)
-    measure.user_measures.each do |user_measure|
-      if user_measure.user.id != current_user.id
-        UserMeasureMailer.task_updated(user_measure).deliver_now
-      end
     end
   end
 

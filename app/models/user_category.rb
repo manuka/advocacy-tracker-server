@@ -11,6 +11,6 @@ class UserCategory < ApplicationRecord
   private
 
   def set_relationship_updated_at
-    user.update_column(:relationship_updated_at, Time.zone.now) if user && !user.destroyed?
+    user.update(relationship_updated_at: Time.zone.now) if user && !user.destroyed?
   end
 end

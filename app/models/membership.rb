@@ -15,7 +15,7 @@ class Membership < VersionedRecord
   end
 
   def set_relationship_updated_at
-    member.update_column(:relationship_updated_at, Time.zone.now) if member && !member.destroyed?
-    memberof.update_column(:relationship_updated_at, Time.zone.now) if memberof && !memberof.destroyed?
+    member.update(relationship_updated_at: Time.zone.now) if member && !member.destroyed?
+    memberof.update(relationship_updated_at: Time.zone.now) if memberof && !memberof.destroyed?
   end
 end

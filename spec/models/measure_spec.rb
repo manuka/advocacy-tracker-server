@@ -95,4 +95,49 @@ RSpec.describe Measure, type: :model do
       }.from(2).to(1)
     end
   end
+
+  context "notifications" do
+    subject { FactoryBot.create(:measure, notifications: true) }
+    let!(:user) { FactoryBot.create(:user) }
+    let(:user_id) { user.id }
+    let!(:user_measure) { FactoryBot.create(:user_measure, measure: subject) }
+
+    before { allow(::PaperTrail.request).to receive(:whodunnit).and_return(user_id) }
+
+    context "for non 'task' measures" do
+      before { allow(subject).to receive(:task?).and_return(false) }
+
+      it "won't send when relationship_updated_at changes" do
+        expect { subject.touch(:relationship_updated_at) }
+          .not_to change { ActionMailer::Base.deliveries.count }.from(0)
+      end
+    end
+
+    context "for 'task' measures" do
+      before { allow(subject).to receive(:task?).and_return(true) }
+
+      context "when the current user has the user_measure" do
+        let(:user_id) { user_measure.user_id }
+
+        it "won't send when relationship_updated_at changes" do
+          expect { subject.touch(:relationship_updated_at) }
+            .not_to change { ActionMailer::Base.deliveries.count }.from(0)
+        end
+      end
+
+      context "when the current user doesn't have the user_measure" do
+        let(:user_id) { FactoryBot.create(:user).id }
+
+        it "will send when relationship_updated_at changes" do
+          expect { subject.touch(:relationship_updated_at) }
+            .to change { ActionMailer::Base.deliveries.count }.by(1)
+        end
+      end
+
+      it "won't send when relationship_updated_at doesn't change" do
+        expect { subject.update(title: "testing 12345") }
+          .not_to change { ActionMailer::Base.deliveries.count }.from(0)
+      end
+    end
+  end
 end

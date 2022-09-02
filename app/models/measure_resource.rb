@@ -13,6 +13,6 @@ class MeasureResource < VersionedRecord
   private
 
   def set_relationship_updated_at
-    measure.update_column(:relationship_updated_at, Time.zone.now) if measure && !measure.destroyed?
+    measure.update(relationship_updated_at: Time.zone.now) if measure && !measure.destroyed?
   end
 end

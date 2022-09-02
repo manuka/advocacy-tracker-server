@@ -20,6 +20,6 @@ class ActorCategory < VersionedRecord
   end
 
   def set_relationship_updated_at
-    actor.update_column(:relationship_updated_at, Time.zone.now) if actor && !actor.destroyed?
+    actor.update(relationship_updated_at: Time.zone.now) if actor && !actor.destroyed?
   end
 end

@@ -13,7 +13,7 @@ class MeasureIndicator < ApplicationRecord
   private
 
   def set_relationship_updated_at
-    measure.update_column(:relationship_updated_at, Time.zone.now) if measure && !measure.destroyed?
-    indicator.update_column(:relationship_updated_at, Time.zone.now) if indicator && !indicator.destroyed?
+    measure.update(relationship_updated_at: Time.zone.now) if measure && !measure.destroyed?
+    indicator.update(relationship_updated_at: Time.zone.now) if indicator && !indicator.destroyed?
   end
 end

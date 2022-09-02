@@ -43,12 +43,20 @@ class Measure < VersionedRecord
     :parent_id_allowed_by_measuretype
   )
 
-  def task?
-    measuretype_id == TASK_MEASURETYPE_ID
+  def self.notifiable_attribute_names
+    Measure.attribute_names - %w[created_at draft is_archive updated_at]
   end
 
-  def self.notifiable_attribute_names
-    Measure.attribute_names - %w[draft is_archive]
+  after_commit :send_task_updated_notifications!,
+    on: :update,
+    if: [:task?, :relationship_updated?]
+
+  def send_task_updated_notifications!(user_id: ::PaperTrail.request.whodunnit)
+    return unless notify?
+
+    user_measures.reject { |um| um.user.id == user_id }.each do |user_measure|
+      UserMeasureMailer.task_updated(user_measure).deliver_now
+    end
   end
 
   private
@@ -59,10 +67,12 @@ class Measure < VersionedRecord
     end
   end
 
-  def parent_id_allowed_by_measuretype
-    if parent_id && !parent.measuretype&.has_parent
-      errors.add(:parent_id, "is not allowed for this measuretype")
-    end
+  def notify?
+    task? &&
+      notifications? &&
+      (!draft? && !saved_change_to_attribute?(:draft)) &&
+      (!is_archive || saved_change_to_attribute?(:is_archive)) &&
+      (saved_changes.keys & Measure.notifiable_attribute_names).any?
   end
 
   def not_own_descendant
@@ -70,5 +80,19 @@ class Measure < VersionedRecord
     while (measure_parent = measure_parent.parent)
       errors.add(:parent_id, "can't be its own descendant") if measure_parent.id == id
     end
+  end
+
+  def parent_id_allowed_by_measuretype
+    if parent_id && !parent.measuretype&.has_parent
+      errors.add(:parent_id, "is not allowed for this measuretype")
+    end
+  end
+
+  def relationship_updated?
+    saved_change_to_attribute?(:relationship_updated_at)
+  end
+
+  def task?
+    measuretype_id == TASK_MEASURETYPE_ID
   end
 end
