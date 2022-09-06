@@ -116,7 +116,7 @@ RSpec.describe Measure, type: :model do
     context "for 'task' measures" do
       before { allow(subject).to receive(:task?).and_return(true) }
 
-      context "when the current user has the user_measure" do
+      context "when the current user owns the task" do
         let(:user_id) { user_measure.user_id }
 
         it "won't send when relationship_updated_at changes" do
@@ -125,7 +125,7 @@ RSpec.describe Measure, type: :model do
         end
       end
 
-      context "when the current user doesn't have the user_measure" do
+      context "when the current user doesn't own the task" do
         let(:user_id) { FactoryBot.create(:user).id }
 
         it "will send when relationship_updated_at changes" do
