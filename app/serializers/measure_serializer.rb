@@ -27,7 +27,8 @@ class MeasureSerializer
     :target_date,
     :title,
     :url,
-    :is_archive
+    :is_archive,
+    :relationship_updated_at
   )
 
   set_type :measures

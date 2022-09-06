@@ -13,7 +13,8 @@ class IndicatorSerializer
     :repeat,
     :end_date,
     :private,
-    :is_archive
+    :is_archive,
+    :relationship_updated_at
   )
 
   set_type :indicators
