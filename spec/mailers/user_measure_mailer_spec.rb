@@ -42,7 +42,7 @@ RSpec.describe UserMeasureMailer, type: :mailer do
     it "renders the headers" do
       expect(mail.subject).to eq(I18n.t("user_measure_mailer.created.subject"))
       expect(mail.to).to eq([user_measure.user.email])
-      expect(mail.from).to eq(%w[plasticpolicy@wwf.no])
+      expect(mail.from).to eq(%w[plasticpolicy@dumpark.com])
     end
 
     it "mentions the user's name" do
