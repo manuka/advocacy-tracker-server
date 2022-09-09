@@ -17,6 +17,6 @@ en:
       subject: Indicator progress report is overdue
   user_measure_mailer:
     created:
-      subject: New measure assigned to you
+      subject: New WWF Plastic Advocacy ${measuretype} assigned to you
     published:
-      subject: A measure assigned to you has been published
+      subject: New WWF Plastic Advocacy %{measuretype} assigned to you
