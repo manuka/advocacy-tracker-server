@@ -10,7 +10,7 @@ class UserMeasureMailer < ApplicationMailer
     @measure_id = user_measure.measure_id
     @name = user_measure.user.name
     @title = user_measure.measure.title
-    @type = user_measure.measure.measuretype.title
+    @type = user_measure.measure.measuretype.title.downcase
 
     mail to: user_measure.user.email, subject: I18n.t("user_measure_mailer.created.subject", measuretype: @type)
   end
@@ -26,7 +26,7 @@ class UserMeasureMailer < ApplicationMailer
     @measure_id = user_measure.measure_id
     @name = user_measure.user.name
     @title = user_measure.measure.title
-    @type = user_measure.measure.measuretype.title
+    @type = user_measure.measure.measuretype.title.downcase
 
     mail to: user_measure.user.email, subject: I18n.t("user_measure_mailer.published.subject", measuretype: @type)
   end
