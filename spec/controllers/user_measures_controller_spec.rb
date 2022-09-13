@@ -80,7 +80,7 @@ RSpec.describe UserMeasuresController, type: :controller do
             sign_in manager
             expect { subject }.to change { ActionMailer::Base.deliveries.count }
             expect(ActionMailer::Base.deliveries.last.to).to eq [user.email]
-            expect(ActionMailer::Base.deliveries.last.subject).to eq I18n.t(:subject, scope: [:user_measure_mailer, :created])
+            expect(ActionMailer::Base.deliveries.last.subject).to eq I18n.t(:subject, scope: [:user_measure_mailer, :created], measuretype: measure.measuretype.title.downcase)
           end
         end
       end

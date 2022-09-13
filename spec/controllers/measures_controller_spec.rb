@@ -356,7 +356,7 @@ RSpec.describe MeasuresController, type: :controller do
               it "will send a notification email to the user" do
                 expect { subject }.to change { ActionMailer::Base.deliveries.count }
                 expect(ActionMailer::Base.deliveries.last.to).to eq [user.email]
-                expect(ActionMailer::Base.deliveries.last.subject).to eq I18n.t(:subject, scope: [:user_measure_mailer, :published])
+                expect(ActionMailer::Base.deliveries.last.subject).to eq I18n.t(:subject, scope: [:user_measure_mailer, :published], measuretype: measure.measuretype.title.downcase)
               end
             end
           end
