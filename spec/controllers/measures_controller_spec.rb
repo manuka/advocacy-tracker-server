@@ -316,7 +316,7 @@ RSpec.describe MeasuresController, type: :controller do
         let!(:user_measure) { FactoryBot.create(:user_measure, user: manager, measure: measure) }
 
         before do
-          allow_any_instance_of(Measure).to receive(:task?).and_return(true)
+          allow_any_instance_of(Measuretype).to receive(:notifications?).and_return(true)
           sign_in admin
         end
 

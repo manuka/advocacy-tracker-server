@@ -105,7 +105,7 @@ RSpec.describe Measure, type: :model do
     before { allow(::PaperTrail.request).to receive(:whodunnit).and_return(user_id) }
 
     context "for non 'task' measures" do
-      before { allow(subject).to receive(:task?).and_return(false) }
+      before { allow(subject.measuretype).to receive(:notifications?).and_return(false) }
 
       it "won't send when relationship_updated_at changes" do
         expect { subject.touch(:relationship_updated_at) }
@@ -114,7 +114,7 @@ RSpec.describe Measure, type: :model do
     end
 
     context "for 'task' measures" do
-      before { allow(subject).to receive(:task?).and_return(true) }
+      before { allow(subject.measuretype).to receive(:notifications?).and_return(true) }
 
       context "when the current user owns the task" do
         let(:user_id) { user_measure.user_id }

@@ -26,7 +26,7 @@ RSpec.describe ActorMeasure, type: :model do
     let(:actor) { FactoryBot.create(:actor) }
     let(:measure) { FactoryBot.create(:measure) }
 
-    before { allow(measure).to receive(:task?).and_return(false) }
+    before { allow(measure.measuretype).to receive(:notifications?).and_return(false) }
     subject { described_class.create(actor: actor, measure: measure) }
 
     it "create sets the relationship_updated_at on the actor" do

@@ -4,6 +4,7 @@ class MeasuretypeSerializer
   attributes(
     :has_parent,
     :has_target,
+    :notifications,
     :title
   )
 
