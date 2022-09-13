@@ -320,6 +320,26 @@ RSpec.describe MeasuresController, type: :controller do
           sign_in admin
         end
 
+        context "when the task is not archived" do
+          let(:measure) { FactoryBot.create(:measure, is_archive: false, notifications: true) }
+
+          context "and is updated to archived" do
+            it "will not create a notification for the user" do
+              expect {
+                put :update, format: :json, params: {id: measure, measure: {is_archive: true}}
+              }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+            end
+
+            context "even if another field is set" do
+              it "will not create a notification for the user" do
+                expect {
+                  put :update, format: :json, params: {id: measure, measure: {description: "updating", is_archive: true}}
+                }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+              end
+            end
+          end
+        end
+
         %w[
           amount_comment
           amount

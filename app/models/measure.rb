@@ -67,9 +67,9 @@ class Measure < VersionedRecord
 
   def notify?
     task? &&
+      !is_archive? &&
       notifications? &&
       (!draft? && !saved_change_to_attribute?(:draft)) &&
-      (!is_archive? || saved_change_to_attribute?(:is_archive)) &&
       (saved_changes.keys & Measure.notifiable_attribute_names).any?
   end
 
