@@ -9,7 +9,7 @@ class ActorCategory < VersionedRecord
   validates :category_id, presence: true, uniqueness: {scope: :actor_id}
   validate :category_taxonomy_enabled_for_actortype
 
-  after_commit :set_relationship_updated_at, on: [:create, :update, :destroy]
+  after_commit :set_relationship_updated, on: [:create, :update, :destroy]
 
   private
 
@@ -19,7 +19,10 @@ class ActorCategory < VersionedRecord
     end
   end
 
-  def set_relationship_updated_at
-    actor.update_column(:relationship_updated_at, Time.zone.now) if actor && !actor.destroyed?
+  def set_relationship_updated
+    if actor && !actor.destroyed?
+      actor.update_column(:relationship_updated_at, Time.zone.now)
+      actor.update_column(:relationship_updated_by_id, ::PaperTrail.request.whodunnit)
+    end
   end
 end

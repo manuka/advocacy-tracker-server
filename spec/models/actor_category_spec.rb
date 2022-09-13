@@ -25,6 +25,9 @@ RSpec.describe ActorCategory, type: :model do
   context "with an actor and a category" do
     let!(:taxonomy) { FactoryBot.create(:actortype_taxonomy, actortype: actor.actortype, taxonomy: category.taxonomy) }
 
+    let(:whodunnit) { FactoryBot.create(:user).id }
+    before { allow(::PaperTrail.request).to receive(:whodunnit).and_return(whodunnit) }
+
     subject { described_class.create(actor: actor, category: category) }
 
     it "create sets the relationship_updated_at on the actor" do
@@ -38,6 +41,20 @@ RSpec.describe ActorCategory, type: :model do
 
     it "destroy sets the relationship_updated_at on the actor" do
       expect { subject.destroy }.to change { actor.reload.relationship_updated_at }
+    end
+
+    it "create sets the relationship_updated_by_id on the actor" do
+      expect { subject }.to change { actor.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "update sets the relationship_updated_by_id on the actor" do
+      subject
+      actor.update_column(:relationship_updated_by_id, nil)
+      expect { subject.touch }.to change { actor.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "destroy sets the relationship_updated_by_id on the actor" do
+      expect { subject.destroy }.to change { actor.reload.relationship_updated_by_id }.to(whodunnit)
     end
   end
 end
