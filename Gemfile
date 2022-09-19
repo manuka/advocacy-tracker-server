@@ -22,11 +22,6 @@ gem "rails", "~> 6.0"
 gem "sass-rails", "~> 6.0"
 gem "secure_headers", ">= 3.0"
 
-group :production, :staging do
-  gem "unicorn"
-  gem "unicorn-worker-killer"
-end
-
 group :development do
   gem "better_errors"
   gem "binding_of_caller"
