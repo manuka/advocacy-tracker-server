@@ -138,8 +138,6 @@ GEM
       railties (>= 3.1.0)
       sass (>= 3.3.0)
       sprockets-es6 (>= 0.9.0)
-    get_process_mem (0.2.7)
-      ffi (~> 1.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
     highline (2.0.3)
@@ -175,7 +173,6 @@ GEM
       activerecord
       kaminari-core (= 1.2.1)
     kaminari-core (1.2.1)
-    kgio (2.11.4)
     launchy (2.5.0)
       addressable (~> 2.7)
     letter_opener (1.7.0)
@@ -267,7 +264,6 @@ GEM
       rake (>= 12.2)
       thor (~> 1.0)
     rainbow (3.1.1)
-    raindrops (0.19.2)
     rake (13.0.6)
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
@@ -364,12 +360,6 @@ GEM
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.3.0)
-    unicorn (6.0.0)
-      kgio (~> 2.6)
-      raindrops (~> 0.7)
-    unicorn-worker-killer (0.4.5)
-      get_process_mem (~> 0)
-      unicorn (>= 4, < 7)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.1.0)
@@ -430,8 +420,6 @@ DEPENDENCIES
   standard
   thin
   timecop
-  unicorn
-  unicorn-worker-killer
   web-console (~> 4.1)
 
 RUBY VERSION
