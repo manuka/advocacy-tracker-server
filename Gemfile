@@ -13,6 +13,7 @@ gem "fast_jsonapi", git: "https://github.com/Netflix/fast_jsonapi",
 gem "foundation-rails"
 gem "jquery-rails"
 gem "kaminari"
+gem "net-smtp"
 gem "oj"
 gem "paper_trail"
 gem "pg", "~> 1.2"
