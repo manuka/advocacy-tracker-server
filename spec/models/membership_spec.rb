@@ -19,6 +19,9 @@ RSpec.describe Membership, type: :model do
   end
 
   context "with a member and a memberof" do
+    let(:whodunnit) { FactoryBot.create(:user).id }
+    before { allow(::PaperTrail.request).to receive(:whodunnit).and_return(whodunnit) }
+
     subject { described_class.create(member: member, memberof: memberof) }
 
     it "create sets the relationship_updated_at on the member" do
@@ -45,6 +48,34 @@ RSpec.describe Membership, type: :model do
 
     it "destroy sets the relationship_updated_at on the memberof" do
       expect { subject.destroy }.to change { memberof.reload.relationship_updated_at }
+    end
+
+    it "create sets the relationship_updated_by_id on the member" do
+      expect { subject }.to change { member.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "create sets the relationship_updated_by_id on the memberof" do
+      expect { subject }.to change { memberof.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "update sets the relationship_updated_by_id on the member" do
+      subject
+      member.update_column(:relationship_updated_by_id, nil)
+      expect { subject.touch }.to change { member.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "update sets the relationship_updated_by_id on the memberof" do
+      subject
+      memberof.update_column(:relationship_updated_by_id, nil)
+      expect { subject.touch }.to change { memberof.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "destroy sets the relationship_updated_by_id on the member" do
+      expect { subject.destroy }.to change { member.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "destroy sets the relationship_updated_by_id on the memberof" do
+      expect { subject.destroy }.to change { memberof.reload.relationship_updated_by_id }.to(whodunnit)
     end
   end
 end

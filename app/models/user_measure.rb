@@ -10,12 +10,19 @@ class UserMeasure < VersionedRecord
     measure.notifications? && !(measure.draft? || measure.is_archive?)
   end
 
-  after_commit :set_relationship_updated_at, on: [:create, :update, :destroy]
+  after_commit :set_relationship_updated, on: [:create, :update, :destroy]
 
   private
 
-  def set_relationship_updated_at
-    measure.update_column(:relationship_updated_at, Time.zone.now) if measure && !measure.destroyed?
-    user.update_column(:relationship_updated_at, Time.zone.now) if user && !user.destroyed?
+  def set_relationship_updated
+    if measure && !measure.destroyed?
+      measure.update_column(:relationship_updated_at, Time.zone.now)
+      measure.update_column(:relationship_updated_by_id, ::PaperTrail.request.whodunnit)
+    end
+
+    if user && !user.destroyed?
+      user.update_column(:relationship_updated_at, Time.zone.now)
+      user.update_column(:relationship_updated_by_id, ::PaperTrail.request.whodunnit)
+    end
   end
 end
