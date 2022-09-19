@@ -19,6 +19,9 @@ RSpec.describe MeasureCategory, type: :model do
   context "when the category's taxonomy is enabled for its measuretype" do
     let!(:measuretype_taxonomy) { FactoryBot.create(:measuretype_taxonomy, measuretype: measure.measuretype, taxonomy: category.taxonomy) }
 
+    let(:whodunnit) { FactoryBot.create(:user).id }
+    before { allow(::PaperTrail.request).to receive(:whodunnit).and_return(whodunnit) }
+
     subject { described_class.create(category: category, measure: measure) }
 
     it "works" do
@@ -36,6 +39,20 @@ RSpec.describe MeasureCategory, type: :model do
 
     it "destroy sets the relationship_updated_at on the measure" do
       expect { subject.destroy }.to change { measure.reload.relationship_updated_at }
+    end
+
+    it "create sets the relationship_updated_by_id on the measure" do
+      expect { subject }.to change { measure.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "update sets the relationship_updated_by_id on the measure" do
+      subject
+      measure.update_column(:relationship_updated_by_id, nil)
+      expect { subject.touch }.to change { measure.reload.relationship_updated_by_id }.to(whodunnit)
+    end
+
+    it "destroy sets the relationship_updated_by_id on the measure" do
+      expect { subject.destroy }.to change { measure.reload.relationship_updated_by_id }.to(whodunnit)
     end
   end
 end

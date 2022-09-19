@@ -10,7 +10,7 @@ class MeasureCategory < VersionedRecord
 
   validate :category_taxonomy_enabled_for_measuretype
 
-  after_commit :set_relationship_updated_at, on: [:create, :update, :destroy]
+  after_commit :set_relationship_updated, on: [:create, :update, :destroy]
 
   private
 
@@ -20,7 +20,10 @@ class MeasureCategory < VersionedRecord
     end
   end
 
-  def set_relationship_updated_at
-    measure.update_column(:relationship_updated_at, Time.zone.now) if measure && !measure.destroyed?
+  def set_relationship_updated
+    if measure && !measure.destroyed?
+      measure.update_column(:relationship_updated_at, Time.zone.now)
+      measure.update_column(:relationship_updated_by_id, ::PaperTrail.request.whodunnit)
+    end
   end
 end

@@ -8,7 +8,7 @@ class MeasureMeasure < VersionedRecord
 
   validate :measure_not_other_measure
 
-  after_commit :set_relationship_updated_at, on: [:create, :update, :destroy]
+  after_commit :set_relationship_updated, on: [:create, :update, :destroy]
 
   private
 
@@ -16,8 +16,15 @@ class MeasureMeasure < VersionedRecord
     errors.add(:measure, "can't be the same as other_measure") if measure == other_measure
   end
 
-  def set_relationship_updated_at
-    measure.update_column(:relationship_updated_at, Time.zone.now) if measure && !measure.destroyed?
-    other_measure.update_column(:relationship_updated_at, Time.zone.now) if other_measure && !other_measure.destroyed?
+  def set_relationship_updated
+    if measure && !measure.destroyed?
+      measure.update_column(:relationship_updated_at, Time.zone.now)
+      measure.update_column(:relationship_updated_by_id, ::PaperTrail.request.whodunnit)
+    end
+
+    if other_measure && !other_measure.destroyed?
+      other_measure.update_column(:relationship_updated_at, Time.zone.now)
+      other_measure.update_column(:relationship_updated_by_id, ::PaperTrail.request.whodunnit)
+    end
   end
 end
