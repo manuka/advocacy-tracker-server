@@ -57,7 +57,6 @@ group :test do
   gem "connection_pool"
   gem "database_cleaner"
   gem "launchy"
-  gem "poltergeist"
   gem "pry-rails"
   gem "shoulda-matchers"
   gem "timecop"
