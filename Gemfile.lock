@@ -1,11 +1,3 @@
-GIT
-  remote: https://github.com/Netflix/fast_jsonapi
-  revision: 83e7fb62f92a93d3bd705e77b38ded9598982e1a
-  branch: dev
-  specs:
-    fast_jsonapi (1.5)
-      activesupport (>= 4.2)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -47,11 +39,6 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    active_model_serializers (0.10.12)
-      actionpack (>= 4.1, < 6.2)
-      activemodel (>= 4.1, < 6.2)
-      case_transform (>= 0.2)
-      jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
     activejob (6.1.4.1)
       activesupport (= 6.1.4.1)
       globalid (>= 0.3.6)
@@ -105,8 +92,6 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
-    case_transform (0.2)
-      activesupport
     childprocess (4.1.0)
     coderay (1.1.3)
     concurrent-ruby (1.1.9)
@@ -173,7 +158,8 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    jsonapi-renderer (0.2.2)
+    jsonapi-serializer (2.2.0)
+      activesupport (>= 4.2)
     kaminari (1.2.1)
       activesupport (>= 4.1.0)
       kaminari-actionview (= 1.2.1)
@@ -213,7 +199,6 @@ GEM
     nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
-    oj (3.13.8)
     orm_adapter (0.5.0)
     overcommit (0.58.0)
       childprocess (>= 0.6.3, < 5)
@@ -391,7 +376,6 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_model_serializers
   awesome_print
   batch_api
   bcrypt (~> 3.1.7)
@@ -408,15 +392,14 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails (~> 6.0)
   faker
-  fast_jsonapi!
   foundation-rails
   i18n-tasks (~> 0.9.6)
   jquery-rails
+  jsonapi-serializer
   kaminari
   launchy
   letter_opener_web
   listen
-  oj
   overcommit
   paper_trail
   pg (~> 1.2)
@@ -442,4 +425,4 @@ RUBY VERSION
    ruby 3.0.2p107
 
 BUNDLED WITH
-   2.2.30
+   2.3.22
