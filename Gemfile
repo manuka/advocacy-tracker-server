@@ -3,17 +3,15 @@
 source "https://rubygems.org"
 ruby File.read(File.expand_path(".ruby-version", __dir__)).strip
 
-gem "active_model_serializers"
 gem "batch_api"
 gem "bcrypt", "~> 3.1.7"
 gem "devise"
 gem "devise_token_auth"
-gem "fast_jsonapi", git: "https://github.com/Netflix/fast_jsonapi",
-                    branch: "dev"
 gem "foundation-rails"
 gem "jquery-rails"
+gem "jsonapi-serializer"
 gem "kaminari"
-gem "oj"
+gem "net-smtp"
 gem "paper_trail"
 gem "pg", "~> 1.2"
 gem "pundit"
@@ -52,7 +50,6 @@ group :test do
   gem "connection_pool"
   gem "database_cleaner"
   gem "launchy"
-  gem "poltergeist"
   gem "pry-rails"
   gem "shoulda-matchers"
   gem "timecop"

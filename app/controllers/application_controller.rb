@@ -31,7 +31,7 @@ class ApplicationController < ActionController::Base
   end
 
   def serialize(target, serializer:)
-    serializer.new(target).serialized_json
+    serializer.new(target).serializable_hash.to_json
   end
 
   def layout_by_resource

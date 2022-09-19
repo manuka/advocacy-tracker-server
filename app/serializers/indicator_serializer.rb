@@ -14,7 +14,8 @@ class IndicatorSerializer
     :end_date,
     :private,
     :is_archive,
-    :relationship_updated_at
+    :relationship_updated_at,
+    :relationship_updated_by_id
   )
 
   set_type :indicators

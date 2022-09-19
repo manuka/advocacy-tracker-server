@@ -6,7 +6,7 @@ class Membership < VersionedRecord
 
   validate :member_not_memberof
 
-  after_commit :set_relationship_updated_at, on: [:create, :update, :destroy]
+  after_commit :set_relationship_updated, on: [:create, :update, :destroy]
 
   private
 
@@ -14,8 +14,15 @@ class Membership < VersionedRecord
     errors.add(:member, "can't be the same as memberof") if member == memberof
   end
 
-  def set_relationship_updated_at
-    member.update_column(:relationship_updated_at, Time.zone.now) if member && !member.destroyed?
-    memberof.update_column(:relationship_updated_at, Time.zone.now) if memberof && !memberof.destroyed?
+  def set_relationship_updated
+    if member && !member.destroyed?
+      member.update_column(:relationship_updated_at, Time.zone.now)
+      member.update_column(:relationship_updated_by_id, ::PaperTrail.request.whodunnit)
+    end
+
+    if memberof && !memberof.destroyed?
+      memberof.update_column(:relationship_updated_at, Time.zone.now)
+      memberof.update_column(:relationship_updated_by_id, ::PaperTrail.request.whodunnit)
+    end
   end
 end
