@@ -21,6 +21,10 @@ class UserMeasuresController < ApplicationController
     authorize @user_measure
 
     if @user_measure.save
+      if @user_measure.user.id != current_user.id && @user_measure.notify?
+        UserMeasureMailer.created(@user_measure).deliver_now
+      end
+
       render json: serialize(@user_measure), status: :created, location: @user_measure
     else
       render json: @user_measure.errors, status: :unprocessable_entity
