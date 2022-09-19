@@ -379,7 +379,7 @@ GEM
     zeitwerk (2.4.2)
 
 PLATFORMS
-  arm64-darwin-21
+  ruby
 
 DEPENDENCIES
   awesome_print
@@ -433,4 +433,4 @@ RUBY VERSION
    ruby 3.0.2p107
 
 BUNDLED WITH
-   2.3.20
+   2.3.22
