@@ -8,6 +8,10 @@ class UserMeasure < VersionedRecord
 
   after_commit :set_relationship_updated, on: [:create, :update, :destroy]
 
+  def notify?
+    measure.notifications? && !(measure.draft? || measure.is_archive?)
+  end
+
   private
 
   def set_relationship_updated

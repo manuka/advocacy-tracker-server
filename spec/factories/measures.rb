@@ -5,6 +5,14 @@ FactoryBot.define do
     association(:measuretype)
     target_date { Faker::Date.forward(days: 450) }
 
+    trait :draft do
+      draft { true }
+    end
+
+    trait :published do
+      draft { false }
+    end
+
     trait :without_recommendation do
       recommendations { [] }
     end

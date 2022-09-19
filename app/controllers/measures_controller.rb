@@ -34,7 +34,11 @@ class MeasuresController < ApplicationController
     if params[:measure][:updated_at] && DateTime.parse(params[:measure][:updated_at]).to_i != @measure.updated_at.to_i
       return render json: '{"error":"Record outdated"}', status: :unprocessable_entity
     end
+
+    originally_draft = @measure.draft?
     if @measure.update!(permitted_attributes(@measure))
+      send_published_notification!(@measure) if originally_draft && !@measure.draft?
+
       set_and_authorize_measure
       render json: serialize(@measure)
     end
@@ -56,6 +60,16 @@ class MeasuresController < ApplicationController
       Indicator.find(params[:indicator_id]).measures
     else
       Measure
+    end
+  end
+
+  def send_published_notification!(measure)
+    return if measure.draft?
+
+    measure.user_measures.each do |user_measure|
+      if user_measure.user.id != current_user.id && user_measure.notify?
+        UserMeasureMailer.published(user_measure).deliver_now
+      end
     end
   end
 

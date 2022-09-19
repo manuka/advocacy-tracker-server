@@ -311,6 +311,58 @@ RSpec.describe MeasuresController, type: :controller do
         expect(subject).to be_ok
       end
 
+      context "with a user measure assigned" do
+        let(:user) { FactoryBot.create(:user) }
+        let!(:user_measure) { FactoryBot.create(:user_measure, measure: measure, user: user) }
+
+        it "will not send any notification emails" do
+          expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+        end
+
+        context "when the measure changes from draft to published" do
+          let(:measure) { FactoryBot.create(:measure, :draft, notifications: notifications) }
+
+          subject do
+            put :update,
+              format: :json,
+              params: {
+                id: measure,
+                measure: {description: "test update", draft: false, target_date: "today update", title: "test update"}
+              }
+          end
+
+          before { sign_in manager }
+
+          context "with measure notifications disabled" do
+            let(:notifications) { false }
+
+            it "will not send a notification email" do
+              expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+            end
+          end
+
+          context "with measure notifications enabled" do
+            let(:notifications) { true }
+
+            context "when the user is the updater" do
+              let(:user) { manager }
+
+              it "will not send a notification email" do
+                expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+              end
+            end
+
+            context "when the user is not the updater" do
+              it "will send a notification email to the user" do
+                expect { subject }.to change { ActionMailer::Base.deliveries.count }
+                expect(ActionMailer::Base.deliveries.last.to).to eq [user.email]
+                expect(ActionMailer::Base.deliveries.last.subject).to eq I18n.t(:subject, scope: [:user_measure_mailer, :published])
+              end
+            end
+          end
+        end
+      end
+
       context "is_archive" do
         subject do
           put :update, format: :json, params: {id: measure, measure: {is_archive: true}}
