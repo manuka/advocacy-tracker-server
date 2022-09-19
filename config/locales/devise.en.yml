@@ -30,7 +30,7 @@ en:
       reset_password_instructions:
         subject: "Reset password instructions"
         request_reset_link_msg: "We’ve received a request to reset your password for the Global Plastic Advocacy Tracker."
-        password_change_link: "Use this link to change my password"
+        password_change_link: "Use this link to change your password"
         ignore_mail_msg: "If you didn't request this, please ignore this email."
         no_changes_msg: "Your password won't change until you access the link above and create a new one."
       unlock_instructions:
