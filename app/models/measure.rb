@@ -24,6 +24,8 @@ class Measure < VersionedRecord
   has_many :due_dates, through: :indicators
   has_many :progress_reports, through: :indicators
 
+  has_many :task_notifications
+
   has_many :user_measures, dependent: :destroy
   has_many :users, through: :user_measures
 
@@ -45,6 +47,28 @@ class Measure < VersionedRecord
     Measure.attribute_names - %w[created_at draft is_archive updated_at]
   end
 
+  def self.tasks
+    joins(:measuretype).where(measuretype: {notifications: true})
+  end
+
+  def self.with_pending_notifications
+    joins(<<~SQL)
+      LEFT OUTER JOIN (
+        SELECT measure_id, MAX(created_at) created_at
+        FROM task_notifications
+        GROUP BY measure_id
+      ) last_task_notifications
+      ON last_task_notifications.measure_id = measures.id
+    SQL
+      .where(
+        "measures.relationship_updated_at <= :relationship_updated_at AND (
+          last_task_notifications.measure_id IS NULL
+          OR measures.relationship_updated_at > last_task_notifications.created_at
+        )",
+        relationship_updated_at: 5.minutes.ago
+      )
+  end
+
   after_commit :send_task_updated_notifications!,
     on: :update,
     if: [:task?, :relationship_updated?]
@@ -55,6 +79,8 @@ class Measure < VersionedRecord
     user_measures.reject { |um| um.user.id == user_id }.each do |user_measure|
       UserMeasureMailer.task_updated(user_measure).deliver_now
     end
+
+    task_notifications.create
   end
 
   private

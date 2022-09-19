@@ -130,8 +130,8 @@ class Seeds
       allow_multiple: false
     )
     ActortypeTaxonomy.create!(
-      taxonomy: countrystatus, #1
-      actortype: countries #1
+      taxonomy: countrystatus, # 1
+      actortype: countries # 1
     )
     # 2 Organisation sector
     orgsector = Taxonomy.create!(
@@ -139,8 +139,8 @@ class Seeds
       allow_multiple: false
     )
     ActortypeTaxonomy.create!(
-      taxonomy: orgsector, #2
-      actortype: orgs #2
+      taxonomy: orgsector, # 2
+      actortype: orgs # 2
     )
     # 3 Contact type aka "role"
     contacttype = Taxonomy.create!(
@@ -149,7 +149,7 @@ class Seeds
     )
     ActortypeTaxonomy.create!(
       taxonomy: contacttype, # 3
-      actortype: contacts #3
+      actortype: contacts # 3
     )
     # 4 Type of region
     regiontype = Taxonomy.create!(
@@ -157,8 +157,8 @@ class Seeds
       allow_multiple: true
     )
     ActortypeTaxonomy.create!(
-      taxonomy: regiontype, #4
-      actortype: regions #4
+      taxonomy: regiontype, # 4
+      actortype: regions # 4
     )
     # 5 type of group
     grouptype = Taxonomy.create!(
@@ -166,8 +166,8 @@ class Seeds
       allow_multiple: false
     )
     ActortypeTaxonomy.create!(
-      taxonomy: grouptype, #5
-      actortype: groups #5
+      taxonomy: grouptype, # 5
+      actortype: groups # 5
     )
     # 6 level of support
     supportlevel = Taxonomy.create!(
@@ -186,8 +186,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: expressiontype, #7
-      measuretype: expressions #1
+      taxonomy: expressiontype, # 7
+      measuretype: expressions # 1
     )
     # 8 tags (buzzwords)
     tags = Taxonomy.create!(
@@ -195,8 +195,8 @@ class Seeds
       allow_multiple: true
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: tags, #8
-      measuretype: expressions #1
+      taxonomy: tags, # 8
+      measuretype: expressions # 1
     )
     # 9 type of event
     eventtype = Taxonomy.create!(
@@ -204,8 +204,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: eventtype, #9
-      measuretype: events #2
+      taxonomy: eventtype, # 9
+      measuretype: events # 2
     )
     # 10 priority of plan
     priority = Taxonomy.create!(
@@ -213,16 +213,16 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: priority, #10
-      measuretype: outreachplans #3
+      taxonomy: priority, # 10
+      measuretype: outreachplans # 3
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: priority, #10
-      measuretype: advocacyplans #4
+      taxonomy: priority, # 10
+      measuretype: advocacyplans # 4
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: priority, #10
-      measuretype: tasks #5
+      taxonomy: priority, # 10
+      measuretype: tasks # 5
     )
     # 11 task status
     status = Taxonomy.create!(
@@ -230,8 +230,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: status, #11
-      measuretype: tasks #5
+      taxonomy: status, # 11
+      measuretype: tasks # 5
     )
     # 12 interaction type
     interactiontype = Taxonomy.create!(
@@ -239,8 +239,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: interactiontype, #12
-      measuretype: interactions #6
+      taxonomy: interactiontype, # 12
+      measuretype: interactions # 6
     )
     # 13 authority
     authority = Taxonomy.create!(
@@ -248,8 +248,8 @@ class Seeds
       allow_multiple: false
     )
     MeasuretypeTaxonomy.create!(
-      taxonomy: authority, #13
-      measuretype: expressions #1
+      taxonomy: authority, # 13
+      measuretype: expressions # 1
     )
 
     # Set up categories ########################################################
@@ -336,7 +336,6 @@ class Seeds
     authority.categories.create!(title: "2 - Inofficial")
     authority.categories.create!(title: "3 - Own assessment")
     authority.categories.create!(title: "4 Third party assessment")
-    
   end
 
   def development_seeds!

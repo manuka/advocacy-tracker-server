@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_13_081345) do
+ActiveRecord::Schema.define(version: 2022_09_19_085621) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,6 +70,7 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
     t.bigint "parent_id"
     t.boolean "is_archive", default: false
     t.datetime "relationship_updated_at", precision: 6
+    t.bigint "relationship_updated_by_id"
     t.index ["actortype_id"], name: "index_actors_on_actortype_id"
     t.index ["created_by_id"], name: "index_actors_on_created_by_id"
     t.index ["manager_id"], name: "index_actors_on_manager_id"
@@ -189,6 +190,7 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
     t.boolean "is_archive", default: false
     t.string "code"
     t.datetime "relationship_updated_at", precision: 6
+    t.bigint "relationship_updated_by_id"
     t.index ["created_at"], name: "index_indicators_on_created_at"
     t.index ["draft"], name: "index_indicators_on_draft"
     t.index ["manager_id"], name: "index_indicators_on_manager_id"
@@ -291,6 +293,7 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
     t.boolean "is_archive", default: false
     t.boolean "notifications", default: true
     t.datetime "relationship_updated_at", precision: 6
+    t.bigint "relationship_updated_by_id"
     t.index ["draft"], name: "index_measures_on_draft"
     t.index ["measuretype_id"], name: "index_measures_on_measuretype_id"
     t.index ["parent_id"], name: "index_measures_on_parent_id"
@@ -445,6 +448,12 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
     t.integer "created_by_id"
   end
 
+  create_table "task_notifications", force: :cascade do |t|
+    t.bigint "measure_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["measure_id"], name: "index_task_notifications_on_measure_id"
+  end
+
   create_table "taxonomies", id: :serial, force: :cascade do |t|
     t.text "title", null: false
     t.boolean "tags_measures"
@@ -533,6 +542,7 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
     t.boolean "allow_password_change", default: true
     t.integer "created_by_id"
     t.datetime "relationship_updated_at", precision: 6
+    t.bigint "relationship_updated_by_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -559,12 +569,14 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
   add_foreign_key "actors", "actors", column: "parent_id"
   add_foreign_key "actors", "actortypes"
   add_foreign_key "actors", "users", column: "manager_id"
+  add_foreign_key "actors", "users", column: "relationship_updated_by_id"
   add_foreign_key "actortype_taxonomies", "actortypes"
   add_foreign_key "actortype_taxonomies", "taxonomies"
   add_foreign_key "framework_frameworks", "frameworks"
   add_foreign_key "framework_frameworks", "frameworks", column: "other_framework_id"
   add_foreign_key "framework_taxonomies", "frameworks"
   add_foreign_key "framework_taxonomies", "taxonomies"
+  add_foreign_key "indicators", "users", column: "relationship_updated_by_id"
   add_foreign_key "measure_actors", "actors"
   add_foreign_key "measure_actors", "measures"
   add_foreign_key "measure_actors", "users", column: "created_by_id"
@@ -580,6 +592,7 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
   add_foreign_key "measure_resources", "users", column: "updated_by_id"
   add_foreign_key "measures", "measures", column: "parent_id"
   add_foreign_key "measures", "measuretypes"
+  add_foreign_key "measures", "users", column: "relationship_updated_by_id"
   add_foreign_key "measuretype_taxonomies", "measuretypes"
   add_foreign_key "measuretype_taxonomies", "taxonomies"
   add_foreign_key "memberships", "actors", column: "member_id"
@@ -592,6 +605,7 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
   add_foreign_key "recommendation_recommendations", "recommendations", column: "other_recommendation_id"
   add_foreign_key "recommendations", "frameworks"
   add_foreign_key "resources", "resourcetypes"
+  add_foreign_key "task_notifications", "measures"
   add_foreign_key "taxonomies", "frameworks"
   add_foreign_key "user_actors", "actors"
   add_foreign_key "user_actors", "users"
@@ -601,4 +615,5 @@ ActiveRecord::Schema.define(version: 2022_09_13_081345) do
   add_foreign_key "user_measures", "users"
   add_foreign_key "user_measures", "users", column: "created_by_id"
   add_foreign_key "user_measures", "users", column: "updated_by_id"
+  add_foreign_key "users", "users", column: "relationship_updated_by_id"
 end

@@ -16,11 +16,14 @@ gem "kaminari"
 gem "oj"
 gem "paper_trail"
 gem "pg", "~> 1.2"
+gem "puma", "~> 5.5"
 gem "pundit"
 gem "rack-cors", require: "rack/cors"
 gem "rails", "~> 6.0"
 gem "sass-rails", "~> 6.0"
 gem "secure_headers", ">= 3.0"
+gem "sidekiq"
+gem "sidekiq-scheduler", "~> 4.0"
 
 group :production, :staging do
   gem "unicorn"
@@ -62,5 +65,3 @@ group :test do
   gem "shoulda-matchers"
   gem "timecop"
 end
-
-gem "puma", "~> 5.5"
