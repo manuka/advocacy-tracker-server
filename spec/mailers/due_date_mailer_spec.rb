@@ -10,6 +10,7 @@ RSpec.describe DueDateMailer, type: :mailer do
       expect(mail.subject).to eq(I18n.t("due_date_mailer.due.subject"))
       expect(mail.to).to eq([manager.email])
       expect(mail.from).to eq(["plasticpolicy@wwf.no"])
+      expect(mail.from_address.display_name).to eq("Global Plastic Policy Team")
     end
 
     it "mentions the managers name" do
@@ -30,6 +31,7 @@ RSpec.describe DueDateMailer, type: :mailer do
       expect(mail.subject).to eq(I18n.t("due_date_mailer.overdue.subject"))
       expect(mail.to).to eq([manager.email])
       expect(mail.from).to eq(["plasticpolicy@wwf.no"])
+      expect(mail.from_address.display_name).to eq("Global Plastic Policy Team")
     end
 
     it "mentions the managers name" do
@@ -51,6 +53,7 @@ RSpec.describe DueDateMailer, type: :mailer do
       expect(mail.subject).to eq(I18n.t("due_date_mailer.category_due.subject"))
       expect(mail.to).to eq([manager.email])
       expect(mail.from).to eq(["plasticpolicy@wwf.no"])
+      expect(mail.from_address.display_name).to eq("Global Plastic Policy Team")
     end
 
     it "mentions the managers name" do
@@ -72,6 +75,7 @@ RSpec.describe DueDateMailer, type: :mailer do
       expect(mail.subject).to eq(I18n.t("due_date_mailer.category_overdue.subject"))
       expect(mail.to).to eq([manager.email])
       expect(mail.from).to eq(["plasticpolicy@wwf.no"])
+      expect(mail.from_address.display_name).to eq("Global Plastic Policy Team")
     end
 
     it "mentions the managers name" do
