@@ -29,8 +29,8 @@ en:
         confirm_account_link: "Confirm my account"
       reset_password_instructions:
         subject: "Reset password instructions"
-        request_reset_link_msg: "Someone has requested a link to change your password for the Global Plastic Advocacy Tracker. You can do this through the link below."
-        password_change_link: "Change my password"
+        request_reset_link_msg: "We’ve received a request to reset your password for the Global Plastic Advocacy Tracker."
+        password_change_link: "Use this link to change your password"
         ignore_mail_msg: "If you didn't request this, please ignore this email."
         no_changes_msg: "Your password won't change until you access the link above and create a new one."
       unlock_instructions:

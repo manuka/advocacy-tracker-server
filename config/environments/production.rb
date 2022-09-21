@@ -80,15 +80,15 @@ Rails.application.configure do # rubocop:disable Metrics/BlockLength
       address: ENV["MAILGUN_SMTP_SERVER"],
       user_name: ENV["MAILGUN_SMTP_LOGIN"],
       password: ENV["MAILGUN_SMTP_PASSWORD"],
-      domain: "impactoss.org",
+      domain: "wwf.no",
       authentication: :plain
     }
     config.action_mailer.raise_delivery_errors = true
     config.action_mailer.default_url_options = {
-      host: ENV["ACTION_MAILER_HOST"] || "impactoss.org",
+      host: ENV["ACTION_MAILER_HOST"] || "wwf.no",
       protocol: ENV["ACTION_MAILER_PROTOCOL"] || "https"
     }
-    config.action_mailer.asset_host = ENV["ACTION_MAILER_ASSET_HOST"] || "https://impactoss.org"
+    config.action_mailer.asset_host = ENV["ACTION_MAILER_ASSET_HOST"] || "https://wwf.no"
   end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
