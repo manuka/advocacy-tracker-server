@@ -20,6 +20,11 @@ gem "rails", "~> 6.0"
 gem "sass-rails", "~> 6.0"
 gem "secure_headers", ">= 3.0"
 
+group :production do
+  gem "net-pop"
+  gem "net-imap"
+end
+
 group :development do
   gem "better_errors"
   gem "binding_of_caller"
