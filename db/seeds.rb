@@ -170,7 +170,7 @@ class Seeds
       actortype: groups # 5
     )
     # 6 level of support
-    supportlevel = Taxonomy.create!(
+    _supportlevel = Taxonomy.create!(
       title: "Level of support",
       allow_multiple: false
     )

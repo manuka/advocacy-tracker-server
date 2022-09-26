@@ -18,7 +18,9 @@ class ActorSerializer
     :private,
     :title,
     :url,
-    :is_archive
+    :is_archive,
+    :relationship_updated_at,
+    :relationship_updated_by_id
   )
 
   set_type :actors
