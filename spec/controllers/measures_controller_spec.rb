@@ -409,65 +409,116 @@ RSpec.describe MeasuresController, type: :controller do
             end
           end
         end
-      end
 
-      context "is_archive" do
-        subject do
-          put :update, format: :json, params: {id: measure, measure: {is_archive: true}}
+        context "with a user measure assigned" do
+          let(:user) { FactoryBot.create(:user) }
+          let!(:user_measure) { FactoryBot.create(:user_measure, measure: measure, user: user) }
+          before { sign_in user }
+
+          it "will not send any notification emails" do
+            expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+          end
+
+          context "when the measure changes from draft to published" do
+            let(:measure) { FactoryBot.create(:measure, :draft, notifications: notifications) }
+
+            subject do
+              put :update,
+                format: :json,
+                params: {
+                  id: measure,
+                  measure: {description: "test update", draft: false, target_date: "today update", title: "test update"}
+                }
+            end
+
+            before { sign_in manager }
+
+            context "with measure notifications disabled" do
+              let(:notifications) { false }
+
+              it "will not send a notification email" do
+                expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+              end
+            end
+
+            context "with measure notifications enabled" do
+              let(:notifications) { true }
+
+              context "when the user is the updater" do
+                let(:user) { manager }
+
+                it "will not send a notification email" do
+                  expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+                end
+              end
+
+              context "when the user is not the updater" do
+                it "will not send a notification email" do
+                  expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+                end
+              end
+            end
+          end
         end
 
-        it "can't be set by manager" do
+        context "is_archive" do
+          subject do
+            put :update, format: :json, params: {id: measure, measure: {is_archive: true}}
+          end
+
+          it "can't be set by manager" do
+            sign_in manager
+            expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+          end
+
+          it "can be set by admin" do
+            sign_in admin
+            expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+          end
+        end
+
+        it "will reject an update where the last_updated_at is older than updated_at in the database" do
           sign_in manager
-          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+          measure_get = get :show, params: {id: measure}, format: :json
+          json = JSON.parse(measure_get.body)
+          current_update_at = json["data"]["attributes"]["updated_at"]
+
+          Timecop.travel(Time.new + 15.days) do
+            subject = put :update,
+              format: :json,
+              params: {id: measure,
+                       measure: {title: "test update", description: "test updateeee", target_date: "today update", updated_at: current_update_at}}
+            expect(subject).to be_ok
+          end
+          Timecop.travel(Time.new + 5.days) do
+            subject = put :update,
+              format: :json,
+              params: {id: measure,
+                       measure: {title: "test update", description: "test updatebbbb", target_date: "today update", updated_at: current_update_at}}
+            expect(subject).to_not be_ok
+          end
         end
 
-        it "can be set by admin" do
-          sign_in admin
-          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq true
+        it "will record what manager updated the measure", versioning: true do
+          expect(PaperTrail).to be_enabled
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json.dig("data", "attributes", "updated_by_id").to_i).to eq manager.id
         end
-      end
 
-      it "will reject an update where the last_updated_at is older than updated_at in the database" do
-        sign_in manager
-        measure_get = get :show, params: {id: measure}, format: :json
-        json = JSON.parse(measure_get.body)
-        current_update_at = json["data"]["attributes"]["updated_at"]
-
-        Timecop.travel(Time.new + 15.days) do
-          subject = put :update,
-            format: :json,
-            params: {id: measure,
-                     measure: {title: "test update", description: "test updateeee", target_date: "today update", updated_at: current_update_at}}
-          expect(subject).to be_ok
+        it "will return the latest updated_by", versioning: true do
+          expect(PaperTrail).to be_enabled
+          measure.versions.first.update_column(:whodunnit, admin.id)
+          sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json.dig("data", "attributes", "updated_by_id").to_i).to eq(manager.id)
         end
-        Timecop.travel(Time.new + 5.days) do
-          subject = put :update,
-            format: :json,
-            params: {id: measure,
-                     measure: {title: "test update", description: "test updatebbbb", target_date: "today update", updated_at: current_update_at}}
-          expect(subject).to_not be_ok
+
+        it "will return an error if params are incorrect" do
+          sign_in manager
+          put :update, format: :json, params: {id: measure, measure: {title: ""}}
+          expect(response).to have_http_status(422)
         end
-      end
-
-      it "will record what manager updated the measure", versioning: true do
-        expect(PaperTrail).to be_enabled
-        sign_in manager
-        json = JSON.parse(subject.body)
-        expect(json.dig("data", "attributes", "updated_by_id").to_i).to eq manager.id
-      end
-
-      it "will return the latest updated_by", versioning: true do
-        expect(PaperTrail).to be_enabled
-        measure.versions.first.update_column(:whodunnit, admin.id)
-        sign_in manager
-        json = JSON.parse(subject.body)
-        expect(json.dig("data", "attributes", "updated_by_id").to_i).to eq(manager.id)
-      end
-
-      it "will return an error if params are incorrect" do
-        sign_in manager
-        put :update, format: :json, params: {id: measure, measure: {title: ""}}
-        expect(response).to have_http_status(422)
       end
     end
   end

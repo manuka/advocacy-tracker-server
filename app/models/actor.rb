@@ -21,6 +21,8 @@ class Actor < VersionedRecord
   has_many :user_actors, dependent: :destroy
   has_many :users, through: :user_actors
 
+  belongs_to :relationship_updated_by, class_name: "User", required: false
+
   validates :title, presence: true
   validate :different_parent, :not_own_descendant
 
