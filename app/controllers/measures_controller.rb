@@ -36,7 +36,7 @@ class MeasuresController < ApplicationController
     end
 
     if @measure.update!(permitted_attributes(@measure))
-      @measure.send_task_updated_notifications!(user_id: current_user.id)
+      @measure.queue_task_updated_notifications!(user_id: current_user.id)
 
       set_and_authorize_measure
       render json: serialize(@measure)

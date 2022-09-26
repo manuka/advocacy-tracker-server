@@ -21,7 +21,6 @@ gem "rails", "~> 6.0"
 gem "sass-rails", "~> 6.0"
 gem "secure_headers", ">= 3.0"
 gem "sidekiq"
-gem "sidekiq-scheduler", "~> 4.0"
 
 group :production do
   gem "net-pop"

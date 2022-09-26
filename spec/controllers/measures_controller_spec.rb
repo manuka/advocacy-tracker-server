@@ -365,9 +365,9 @@ RSpec.describe MeasuresController, type: :controller do
             let(:measure) { FactoryBot.create(:measure, :published, notifications: true) }
 
             it "notifies the user of an update to #{attr}" do
-              expect {
-                put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
-              }.to change { ActionMailer::Base.deliveries.count }.by(1)
+              expect(TaskNotificationJob).to receive(:perform_in).with(20.seconds, user_measure.id)
+
+              put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
             end
           end
 
@@ -375,9 +375,9 @@ RSpec.describe MeasuresController, type: :controller do
             let(:measure) { FactoryBot.create(:measure, :draft, notifications: true) }
 
             it "does not notify the user of an update to #{attr}" do
-              expect {
-                put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
-              }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+              expect(TaskNotificationJob).not_to receive(:perform_in)
+
+              put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
             end
           end
 
@@ -385,16 +385,16 @@ RSpec.describe MeasuresController, type: :controller do
             let(:measure) { FactoryBot.create(:measure, :is_archive, notifications: true) }
 
             it "does not notify the user of an update to #{attr}" do
-              expect {
-                put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
-              }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+              expect(TaskNotificationJob).not_to receive(:perform_in)
+
+              put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
             end
 
             context "and is updated to not archived" do
               it "does notify the user of an update to #{attr}" do
-                expect {
-                  put :update, format: :json, params: {id: measure, measure: {attr => "test", :is_archive => false}}
-                }.to change { ActionMailer::Base.deliveries.count }.by(1)
+                expect(TaskNotificationJob).to receive(:perform_in).with(20.seconds, user_measure.id)
+
+                put :update, format: :json, params: {id: measure, measure: {attr => "test", :is_archive => false}}
               end
             end
           end
@@ -403,9 +403,9 @@ RSpec.describe MeasuresController, type: :controller do
             let(:measure) { FactoryBot.create(:measure, :draft, notifications: true) }
 
             it "does not notify the user of an update to #{attr}" do
-              expect {
-                put :update, format: :json, params: {id: measure, measure: {attr => "test", :draft => false}}
-              }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+              expect(TaskNotificationJob).not_to receive(:perform_in)
+
+              put :update, format: :json, params: {id: measure, measure: {attr => "test", :draft => false}}
             end
           end
         end
@@ -416,7 +416,7 @@ RSpec.describe MeasuresController, type: :controller do
           before { sign_in user }
 
           it "will not send any notification emails" do
-            expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+            expect(TaskNotificationJob).not_to receive(:perform_in)
           end
 
           context "when the measure changes from draft to published" do
@@ -436,8 +436,8 @@ RSpec.describe MeasuresController, type: :controller do
             context "with measure notifications disabled" do
               let(:notifications) { false }
 
-              it "will not send a notification email" do
-                expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+              it "will not queue a notification email" do
+                expect(TaskNotificationJob).not_to receive(:perform_in)
               end
             end
 
@@ -447,14 +447,14 @@ RSpec.describe MeasuresController, type: :controller do
               context "when the user is the updater" do
                 let(:user) { manager }
 
-                it "will not send a notification email" do
-                  expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+                it "will not queue a notification email" do
+                  expect(TaskNotificationJob).not_to receive(:perform_in)
                 end
               end
 
               context "when the user is not the updater" do
-                it "will not send a notification email" do
-                  expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+                it "will not queue a notification email" do
+                  expect(TaskNotificationJob).not_to receive(:perform_in)
                 end
               end
             end

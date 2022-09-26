@@ -7,7 +7,7 @@ class UserMeasure < VersionedRecord
   validates :measure_id, presence: true
 
   def notify?
-    measure.notifications? && !(measure.draft? || measure.is_archive?)
+    measure.notifications?
   end
 
   after_commit :set_relationship_updated, on: [:create, :update, :destroy]

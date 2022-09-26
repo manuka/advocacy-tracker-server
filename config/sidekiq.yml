@@ -1,7 +1,0 @@
-schedule:
-  periodic_task_reminder:
-    class: PeriodicTaskReminder
-    every: 1h
-  task_notification:
-    class: TaskNotification
-    every: 5m

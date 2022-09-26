@@ -49,43 +49,33 @@ class Measure < VersionedRecord
     Measure.attribute_names - %w[created_at draft is_archive updated_at]
   end
 
-  def self.tasks
-    joins(:measuretype).where(measuretype: {notifications: true})
+  def notifiable_user_measures(user_id:)
+    user_measures.reject { |um| um.user.id == user_id }
   end
 
-  def self.with_pending_notifications
-    joins(<<~SQL)
-      LEFT OUTER JOIN (
-        SELECT measure_id, MAX(created_at) created_at
-        FROM task_notifications
-        GROUP BY measure_id
-      ) last_task_notifications
-      ON last_task_notifications.measure_id = measures.id
-    SQL
-      .where(
-        "measures.relationship_updated_at <= :relationship_updated_at AND (
-          last_task_notifications.measure_id IS NULL
-          OR measures.relationship_updated_at > last_task_notifications.created_at
-        )",
-        relationship_updated_at: 5.minutes.ago
-      )
-  end
-
-  after_commit :send_task_updated_notifications!,
+  after_commit :queue_task_updated_notifications!,
     on: :update,
     if: [:task?, :relationship_updated?]
 
-  def send_task_updated_notifications!(user_id: ::PaperTrail.request.whodunnit)
+  def queue_task_updated_notifications!(user_id: ::PaperTrail.request.whodunnit)
     return unless notify?
 
-    user_measures.reject { |um| um.user.id == user_id }.each do |user_measure|
-      UserMeasureMailer.task_updated(user_measure).deliver_now
-    end
+    delete_existing_task_notifications!(user_id:)
 
-    task_notifications.create
+    notifiable_user_measures(user_id:).each do |user_measure|
+      TaskNotificationJob.perform_in(20.seconds, user_measure.id)
+    end
   end
 
   private
+
+  def delete_existing_task_notifications!(user_id:)
+    user_measure_ids = notifiable_user_measures(user_id:).pluck(:id)
+
+    Sidekiq::ScheduledSet.new
+      .select { |job| user_measure_ids.include?(job.args.first) && job.klass == "TaskNotificationJob" }
+      .map(&:delete)
+  end
 
   def different_parent
     if parent_id && parent_id == id

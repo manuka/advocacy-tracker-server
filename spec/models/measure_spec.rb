@@ -119,24 +119,27 @@ RSpec.describe Measure, type: :model do
       context "when the current user owns the task" do
         let(:user_id) { user_measure.user_id }
 
-        it "won't send when relationship_updated_at changes" do
-          expect { subject.touch(:relationship_updated_at) }
-            .not_to change { ActionMailer::Base.deliveries.count }.from(0)
+        it "won't queue notifications when relationship_updated_at changes" do
+          expect(TaskNotificationJob).not_to receive(:perform_in)
+
+          subject.touch(:relationship_updated_at)
         end
       end
 
       context "when the current user doesn't own the task" do
         let(:user_id) { FactoryBot.create(:user).id }
 
-        it "will send when relationship_updated_at changes" do
-          expect { subject.touch(:relationship_updated_at) }
-            .to change { ActionMailer::Base.deliveries.count }.by(1)
+        it "will queue notifications when relationship_updated_at changes" do
+          expect(TaskNotificationJob).to receive(:perform_in).with(20.seconds, user_measure.id)
+
+          subject.touch(:relationship_updated_at)
         end
       end
 
-      it "won't send when relationship_updated_at doesn't change" do
-        expect { subject.update(title: "testing 12345") }
-          .not_to change { ActionMailer::Base.deliveries.count }.from(0)
+      it "won't queue notifications when relationship_updated_at doesn't change" do
+        expect(subject).not_to receive(:queue_task_updated_notifications!)
+
+        subject.update(title: "testing 12345")
       end
     end
   end
