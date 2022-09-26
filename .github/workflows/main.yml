@@ -26,6 +26,8 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
 
       - name: "Set up PostgreSQL using VM's server"
         run: |
