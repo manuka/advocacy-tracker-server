@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_19_085621) do
+ActiveRecord::Schema.define(version: 2022_09_13_083216) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -448,12 +448,6 @@ ActiveRecord::Schema.define(version: 2022_09_19_085621) do
     t.integer "created_by_id"
   end
 
-  create_table "task_notifications", force: :cascade do |t|
-    t.bigint "measure_id", null: false
-    t.datetime "created_at", null: false
-    t.index ["measure_id"], name: "index_task_notifications_on_measure_id"
-  end
-
   create_table "taxonomies", id: :serial, force: :cascade do |t|
     t.text "title", null: false
     t.boolean "tags_measures"
@@ -605,7 +599,6 @@ ActiveRecord::Schema.define(version: 2022_09_19_085621) do
   add_foreign_key "recommendation_recommendations", "recommendations", column: "other_recommendation_id"
   add_foreign_key "recommendations", "frameworks"
   add_foreign_key "resources", "resourcetypes"
-  add_foreign_key "task_notifications", "measures"
   add_foreign_key "taxonomies", "frameworks"
   add_foreign_key "user_actors", "actors"
   add_foreign_key "user_actors", "users"
