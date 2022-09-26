@@ -24,8 +24,6 @@ class Measure < VersionedRecord
   has_many :due_dates, through: :indicators
   has_many :progress_reports, through: :indicators
 
-  has_many :task_notifications
-
   has_many :user_measures, dependent: :destroy
   has_many :users, through: :user_measures
 
