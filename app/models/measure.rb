@@ -63,7 +63,7 @@ class Measure < VersionedRecord
     delete_existing_task_notifications!(user_id:)
 
     notifiable_user_measures(user_id:).each do |user_measure|
-      TaskNotificationJob.perform_in(20.seconds, user_measure.id)
+      TaskNotificationJob.perform_in(ENV.fetch("TASK_NOTIFICATION_DELAY", 20).to_i.seconds, user_measure.id)
     end
   end
 

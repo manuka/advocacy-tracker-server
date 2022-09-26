@@ -130,7 +130,7 @@ RSpec.describe Measure, type: :model do
         let(:user_id) { FactoryBot.create(:user).id }
 
         it "will queue notifications when relationship_updated_at changes" do
-          expect(TaskNotificationJob).to receive(:perform_in).with(20.seconds, user_measure.id)
+          expect(TaskNotificationJob).to receive(:perform_in).with(ENV.fetch("TASK_NOTIFICATION_DELAY", 20).to_i.seconds, user_measure.id)
 
           subject.touch(:relationship_updated_at)
         end

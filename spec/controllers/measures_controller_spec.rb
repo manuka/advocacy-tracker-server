@@ -365,7 +365,7 @@ RSpec.describe MeasuresController, type: :controller do
             let(:measure) { FactoryBot.create(:measure, :published, notifications: true) }
 
             it "notifies the user of an update to #{attr}" do
-              expect(TaskNotificationJob).to receive(:perform_in).with(20.seconds, user_measure.id)
+              expect(TaskNotificationJob).to receive(:perform_in).with(ENV.fetch("TASK_NOTIFICATION_DELAY", 20).to_i.seconds, user_measure.id)
 
               put :update, format: :json, params: {id: measure, measure: {attr => "test"}}
             end
@@ -392,7 +392,7 @@ RSpec.describe MeasuresController, type: :controller do
 
             context "and is updated to not archived" do
               it "does notify the user of an update to #{attr}" do
-                expect(TaskNotificationJob).to receive(:perform_in).with(20.seconds, user_measure.id)
+                expect(TaskNotificationJob).to receive(:perform_in).with(ENV.fetch("TASK_NOTIFICATION_DELAY", 20).to_i.seconds, user_measure.id)
 
                 put :update, format: :json, params: {id: measure, measure: {attr => "test", :is_archive => false}}
               end
