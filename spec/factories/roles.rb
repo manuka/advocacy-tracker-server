@@ -11,6 +11,10 @@ FactoryBot.define do
       name { "analyst" }
     end
 
+    trait :coordinator do
+      name { "coordinator" }
+    end
+
     trait :manager do
       name { "manager" }
     end

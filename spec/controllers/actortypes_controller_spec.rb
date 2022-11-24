@@ -22,6 +22,12 @@ RSpec.describe ActortypesController, type: :controller do
         it { expect(subject).to be_ok }
       end
 
+      context "as coordinator" do
+        before { sign_in FactoryBot.create(:user, :coordinator) }
+
+        it { expect(subject).to be_ok }
+      end
+
       context "as admin" do
         before { sign_in FactoryBot.create(:user, :admin) }
 
@@ -47,6 +53,12 @@ RSpec.describe ActortypesController, type: :controller do
 
       context "as manager" do
         before { sign_in FactoryBot.create(:user, :manager) }
+
+        it { expect(subject).to be_ok }
+      end
+
+      context "as coordinator" do
+        before { sign_in FactoryBot.create(:user, :coordinator) }
 
         it { expect(subject).to be_ok }
       end

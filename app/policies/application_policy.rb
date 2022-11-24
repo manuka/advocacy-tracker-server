@@ -11,11 +11,11 @@ class ApplicationPolicy
   end
 
   def create?
-    @user.role?("admin") || @user.role?("manager")
+    @user.role?("admin") || @user.role?("manager") || @user.role?("coordinator")
   end
 
   def update?
-    @user.role?("admin") || @user.role?("manager")
+    @user.role?("admin") || @user.role?("manager") || @user.role?("coordinator")
   end
 
   def show?
@@ -23,7 +23,7 @@ class ApplicationPolicy
   end
 
   def destroy?
-    @user.role?("admin") || @user.role?("manager")
+    @user.role?("admin") || @user.role?("manager") || @user.role?("coordinator")
   end
 
   class Scope
@@ -31,6 +31,7 @@ class ApplicationPolicy
 
     def resolve
       return scope.all if user.role?("admin")
+      return resolve_for_coordinator if user.role?("coordinator")
       return resolve_for_manager if user.role?("manager")
       return resolve_for_analyst if user.role?("analyst")
     end
@@ -42,6 +43,12 @@ class ApplicationPolicy
       analyst_scope = analyst_scope.where(private: false) if scope.column_names.include?("private")
 
       analyst_scope
+    end
+
+    def resolve_for_coordinator
+      coordinator_scope = scope.all
+      coordinator_scope = coordinator_scope.where(is_archive: false) if scope.column_names.include?("is_archive")
+      coordinator_scope
     end
 
     def resolve_for_manager
