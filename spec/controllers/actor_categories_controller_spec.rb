@@ -36,6 +36,7 @@ RSpec.describe ActorCategoriesController, type: :controller do
     context "when signed in" do
       let(:guest) { FactoryBot.create(:user) }
       let(:user) { FactoryBot.create(:user, :manager) }
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
 
       subject do
         post :create,
@@ -55,6 +56,11 @@ RSpec.describe ActorCategoriesController, type: :controller do
 
       it "will allow a manager to create a actor_category" do
         sign_in user
+        expect(subject).to be_created
+      end
+
+      it "will allow a coordinator to create a actor_category" do
+        sign_in coordinator
         expect(subject).to be_created
       end
 

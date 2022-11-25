@@ -6,6 +6,7 @@ require "json"
 RSpec.describe IndicatorsController, type: :controller do
   let(:admin) { FactoryBot.create(:user, :admin) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
 
@@ -37,6 +38,12 @@ RSpec.describe IndicatorsController, type: :controller do
           json = JSON.parse(subject.body)
           expect(json["data"].length).to eq(2)
         end
+
+        it "coordinator will see draft indicators" do
+          sign_in coordinator
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
       end
 
       context "is_archive indicators" do
@@ -51,6 +58,12 @@ RSpec.describe IndicatorsController, type: :controller do
 
         it "manager will not see" do
           sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
+        it "coordinator will not see" do
+          sign_in coordinator
           json = JSON.parse(subject.body)
           expect(json["data"].length).to eq(1)
         end
@@ -85,6 +98,7 @@ RSpec.describe IndicatorsController, type: :controller do
     let(:indicator) { FactoryBot.create(:indicator) }
     let(:draft_indicator) { FactoryBot.create(:indicator, draft: true) }
     let(:private_indicator) { FactoryBot.create(:indicator, :private) }
+    let(:private_indicator_by_coordinator) { FactoryBot.create(:indicator, :private, created_by_id: coordinator.id) }
     let(:private_indicator_by_manager) { FactoryBot.create(:indicator, :private, created_by_id: manager.id) }
     let(:requested_resource) { indicator }
 
@@ -116,6 +130,24 @@ RSpec.describe IndicatorsController, type: :controller do
           let(:requested_resource) { private_indicator }
 
           it { expect(subject).to be_not_found }
+        end
+      end
+
+      context "as coordinator" do
+        before { sign_in coordinator }
+
+        it { expect(subject).to be_ok }
+
+        context "who created will see" do
+          let(:requested_resource) { private_indicator_by_coordinator }
+
+          it { expect(subject).to be_ok }
+        end
+
+        context "who didn't create will see" do
+          let(:requested_resource) { private_indicator }
+
+          it { expect(subject).to be_ok }
         end
       end
     end

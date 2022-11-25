@@ -6,6 +6,7 @@ require "json"
 RSpec.describe ActorsController, type: :controller do
   let(:admin) { FactoryBot.create(:user, :admin) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
 
@@ -34,6 +35,12 @@ RSpec.describe ActorsController, type: :controller do
 
         it "manager will see draft actors" do
           sign_in manager
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
+        it "coordinator will see draft actors" do
+          sign_in coordinator
           json = JSON.parse(subject.body)
           expect(json["data"].length).to eq(2)
         end

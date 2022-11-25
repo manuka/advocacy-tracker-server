@@ -26,6 +26,7 @@ class Seeds
   def base_seeds!
     # Set up user roles
     Role.create!(name: "admin", friendly_name: "Admin")
+    Role.create!(name: "coordinator", friendly_name: "Coordinator")
     Role.create!(name: "manager", friendly_name: "Team Member")
     Role.create!(name: "analyst", friendly_name: "Visitor")
 

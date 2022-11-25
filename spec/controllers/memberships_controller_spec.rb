@@ -3,6 +3,7 @@ require "json"
 
 RSpec.describe MembershipsController, type: :controller do
   let(:analyst) { FactoryBot.create(:user, :analyst) }
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
   let(:member) { FactoryBot.create(:actor) }
@@ -60,6 +61,11 @@ RSpec.describe MembershipsController, type: :controller do
         expect(subject).to be_created
       end
 
+      it "will allow a coordinator to create a membership" do
+        sign_in coordinator
+        expect(subject).to be_created
+      end
+
       it "will return an error if params are incorrect" do
         sign_in manager
         post :create, format: :json, params: {membership: {description: "desc only", taxonomy_id: 999}}
@@ -98,6 +104,11 @@ RSpec.describe MembershipsController, type: :controller do
 
       it "will allow a manager to delete a membership" do
         sign_in manager
+        expect(subject).to be_no_content
+      end
+
+      it "will allow a coordinator to delete a membership" do
+        sign_in coordinator
         expect(subject).to be_no_content
       end
     end

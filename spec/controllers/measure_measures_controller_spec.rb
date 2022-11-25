@@ -28,6 +28,7 @@ RSpec.describe MeasureMeasuresController, type: :controller do
     end
 
     context "when signed in" do
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
       let(:guest) { FactoryBot.create(:user) }
       let(:manager) { FactoryBot.create(:user, :manager) }
       let(:measure) { FactoryBot.create(:measure) }
@@ -54,6 +55,11 @@ RSpec.describe MeasureMeasuresController, type: :controller do
         expect(subject).to be_created
       end
 
+      it "will allow a coordinator to create a measure_measure" do
+        sign_in coordinator
+        expect(subject).to be_created
+      end
+
       it "will return an error if params are incorrect" do
         sign_in manager
         post :create, format: :json, params: {measure_measure: {description: "desc only", taxonomy_id: 999}}
@@ -73,6 +79,7 @@ RSpec.describe MeasureMeasuresController, type: :controller do
     end
 
     context "when user signed in" do
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
       let(:guest) { FactoryBot.create(:user) }
       let(:user) { FactoryBot.create(:user, :manager) }
 
@@ -83,6 +90,11 @@ RSpec.describe MeasureMeasuresController, type: :controller do
 
       it "will allow a manager to delete a measure_measure" do
         sign_in user
+        expect(subject).to be_no_content
+      end
+
+      it "will allow a coordinator to delete a measure_measure" do
+        sign_in coordinator
         expect(subject).to be_no_content
       end
     end
