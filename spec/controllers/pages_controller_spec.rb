@@ -3,6 +3,7 @@ require "json"
 
 RSpec.describe PagesController, type: :controller do
   let(:admin) { FactoryBot.create(:user, :admin) }
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
@@ -30,17 +31,24 @@ RSpec.describe PagesController, type: :controller do
           json = JSON.parse(subject.body)
           expect(json["data"].length).to eq(2)
         end
+
+        it "coordinator will see draft pages" do
+          sign_in coordinator
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
       end
 
       context "private" do
         let!(:page) { FactoryBot.create(:page, :not_private) }
         let!(:private_page) { FactoryBot.create(:page, :private) }
         let!(:private_page_by_manager) { FactoryBot.create(:page, :private, created_by_id: manager.id) }
+        let!(:private_page_by_coordinator) { FactoryBot.create(:page, :private, created_by_id: coordinator.id) }
 
         it "admin will see" do
           sign_in admin
           json = JSON.parse(subject.body)
-          expect(json["data"].length).to eq(3)
+          expect(json["data"].length).to eq(4)
         end
 
         it "manager who created will see" do
@@ -53,6 +61,18 @@ RSpec.describe PagesController, type: :controller do
           sign_in FactoryBot.create(:user, :manager)
           json = JSON.parse(subject.body)
           expect(json["data"].length).to eq(1)
+        end
+
+        it "coordinator who created will see" do
+          sign_in coordinator
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(4)
+        end
+
+        it "coordinator who didn't create will not see" do
+          sign_in FactoryBot.create(:user, :coordinator)
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(4)
         end
       end
     end

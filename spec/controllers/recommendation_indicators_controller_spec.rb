@@ -2,6 +2,11 @@ require "rails_helper"
 require "json"
 
 RSpec.describe RecommendationIndicatorsController, type: :controller do
+  let(:guest) { FactoryBot.create(:user) }
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
+  let(:manager) { FactoryBot.create(:user, :manager) }
+  let(:admin) { FactoryBot.create(:user, :admin) }
+
   describe "index" do
     subject { get :index, format: :json }
 
@@ -28,9 +33,6 @@ RSpec.describe RecommendationIndicatorsController, type: :controller do
     end
 
     context "when signed in" do
-      let(:guest) { FactoryBot.create(:user) }
-      let(:manager) { FactoryBot.create(:user, :manager) }
-      let(:admin) { FactoryBot.create(:user, :admin) }
       let(:recommendation) { FactoryBot.create(:recommendation) }
       let(:indicator) { FactoryBot.create(:indicator) }
 
@@ -52,6 +54,11 @@ RSpec.describe RecommendationIndicatorsController, type: :controller do
 
       it "will allow a manager to create a recommendation_indicator" do
         sign_in manager
+        expect(subject).to be_created
+      end
+
+      it "will allow a coordinator to create a recommendation_indicator" do
+        sign_in coordinator
         expect(subject).to be_created
       end
 
@@ -79,10 +86,6 @@ RSpec.describe RecommendationIndicatorsController, type: :controller do
     end
 
     context "when signed in" do
-      let(:guest) { FactoryBot.create(:user) }
-      let(:manager) { FactoryBot.create(:user, :manager) }
-      let(:admin) { FactoryBot.create(:user, :admin) }
-
       it "wont allow a guest to delete a recommendation_indicator" do
         sign_in guest
         expect(subject).to be_forbidden
@@ -90,6 +93,11 @@ RSpec.describe RecommendationIndicatorsController, type: :controller do
 
       it "will allow a manager to delete a recommendation_indicator" do
         sign_in manager
+        expect(subject).to be_no_content
+      end
+
+      it "will allow a coordinator to delete a recommendation_indicator" do
+        sign_in coordinator
         expect(subject).to be_no_content
       end
 
