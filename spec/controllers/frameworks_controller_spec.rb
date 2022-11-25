@@ -1,6 +1,7 @@
 require "rails_helper"
 
 RSpec.describe FrameworksController, type: :controller do
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
   let!(:guest) { FactoryBot.create(:user) }
   let!(:manager) { FactoryBot.create(:user, :manager) }
 
@@ -23,6 +24,12 @@ RSpec.describe FrameworksController, type: :controller do
         json = JSON.parse(subject.body)
         expect(framework_count(json)).to eq(3)
       end
+
+      it "returns all frameworks for coordinator" do
+        sign_in coordinator
+        json = JSON.parse(subject.body)
+        expect(framework_count(json)).to eq(3)
+      end
     end
   end
 
@@ -42,6 +49,12 @@ RSpec.describe FrameworksController, type: :controller do
 
       it "returns the expected framework for manager" do
         sign_in manager
+        json = JSON.parse(subject.body)
+        expect(json.dig("data", "id").to_i).to eq(framework.id)
+      end
+
+      it "returns the expected framework for coordinator" do
+        sign_in coordinator
         json = JSON.parse(subject.body)
         expect(json.dig("data", "id").to_i).to eq(framework.id)
       end
