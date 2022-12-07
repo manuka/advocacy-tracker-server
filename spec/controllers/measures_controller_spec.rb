@@ -401,11 +401,12 @@ RSpec.describe MeasuresController, type: :controller do
 
           context "when the task is updated from draft" do
             let(:measure) { FactoryBot.create(:measure, :draft, notifications: true) }
+            before { allow(UserMeasureMailer).to receive(:task_updated).and_return(double(deliver_now: true)) }
 
             it "does not notify the user of an update to #{attr}" do
-              expect {
-                put :update, format: :json, params: {id: measure, measure: {attr => "test", :draft => false}}
-              }.not_to change { ActionMailer::Base.deliveries.count }.from(0)
+              subject
+
+              expect(UserMeasureMailer).not_to have_received(:task_updated)
             end
           end
         end
@@ -442,19 +443,23 @@ RSpec.describe MeasuresController, type: :controller do
             end
 
             context "with measure notifications enabled" do
+              before { allow(UserMeasureMailer).to receive(:task_updated).and_return(double(deliver_now: true)) }
+
               let(:notifications) { true }
 
               context "when the user is the updater" do
                 let(:user) { manager }
 
                 it "will not send a notification email" do
-                  expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+                  expect(UserMeasureMailer).not_to have_received(:task_updated)
                 end
               end
 
               context "when the user is not the updater" do
                 it "will not send a notification email" do
-                  expect { subject }.not_to change { ActionMailer::Base.deliveries.count }
+                  subject
+
+                  expect(UserMeasureMailer).not_to have_received(:task_updated)
                 end
               end
             end
