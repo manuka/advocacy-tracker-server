@@ -24,7 +24,7 @@ class UserRolePolicy < ApplicationPolicy
 
   class Scope < Scope
     def resolve
-      return super if @user.role?("admin") || @user.role?("manager") || @user.role?("analyst")
+      return super if @user.role?("admin") || @user.role?("manager") || @user.role?("coordinator") || @user.role?("analyst")
 
       scope.where(user_id: @user.id)
     end

@@ -31,6 +31,7 @@ RSpec.describe MeasureResourcesController, type: :controller do
     end
 
     context "when signed in" do
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
       let(:guest) { FactoryBot.create(:user) }
       let(:user) { FactoryBot.create(:user, :manager) }
 
@@ -52,6 +53,11 @@ RSpec.describe MeasureResourcesController, type: :controller do
 
       it "will allow a manager to create a measure_resource" do
         sign_in user
+        expect(subject).to be_created
+      end
+
+      it "will allow a coordinator to create a measure_resource" do
+        sign_in coordinator
         expect(subject).to be_created
       end
 
@@ -81,6 +87,7 @@ RSpec.describe MeasureResourcesController, type: :controller do
     end
 
     context "when user signed in" do
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
       let(:guest) { FactoryBot.create(:user) }
       let(:user) { FactoryBot.create(:user, :manager) }
 
@@ -91,6 +98,11 @@ RSpec.describe MeasureResourcesController, type: :controller do
 
       it "will allow a manager to delete a measure_resource" do
         sign_in user
+        expect(subject).to be_no_content
+      end
+
+      it "will allow a coordinator to delete a measure_resource" do
+        sign_in coordinator
         expect(subject).to be_no_content
       end
     end

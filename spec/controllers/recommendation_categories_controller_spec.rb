@@ -2,6 +2,10 @@ require "rails_helper"
 require "json"
 
 RSpec.describe RecommendationCategoriesController, type: :controller do
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
+  let(:guest) { FactoryBot.create(:user) }
+  let(:manager) { FactoryBot.create(:user, :manager) }
+
   describe "Get index" do
     subject { get :index, format: :json }
 
@@ -28,8 +32,6 @@ RSpec.describe RecommendationCategoriesController, type: :controller do
     end
 
     context "when signed in" do
-      let(:guest) { FactoryBot.create(:user) }
-      let(:user) { FactoryBot.create(:user, :manager) }
       let(:recommendation) { FactoryBot.create(:recommendation) }
       let(:category) { FactoryBot.create(:category) }
 
@@ -50,12 +52,17 @@ RSpec.describe RecommendationCategoriesController, type: :controller do
       end
 
       it "will allow a manager to create a recommendation_category" do
-        sign_in user
+        sign_in manager
+        expect(subject).to be_created
+      end
+
+      it "will allow a coordinator to create a recommendation_category" do
+        sign_in coordinator
         expect(subject).to be_created
       end
 
       it "will return an error if params are incorrect" do
-        sign_in user
+        sign_in manager
         post :create, format: :json, params: {recommendation_category: {description: "desc only", taxonomy_id: 999}}
         expect(response).to have_http_status(422)
       end
@@ -73,16 +80,18 @@ RSpec.describe RecommendationCategoriesController, type: :controller do
     end
 
     context "when user signed in" do
-      let(:guest) { FactoryBot.create(:user) }
-      let(:user) { FactoryBot.create(:user, :manager) }
-
       it "will not allow a guest to delete a recommendation_category" do
         sign_in guest
         expect(subject).to be_forbidden
       end
 
       it "will allow a manager to delete a recommendation_category" do
-        sign_in user
+        sign_in manager
+        expect(subject).to be_no_content
+      end
+
+      it "will allow a coordinator to delete a recommendation_category" do
+        sign_in coordinator
         expect(subject).to be_no_content
       end
     end

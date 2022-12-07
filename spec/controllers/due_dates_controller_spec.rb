@@ -2,6 +2,8 @@ require "rails_helper"
 require "json"
 
 RSpec.describe DueDatesController, type: :controller do
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
+
   describe "Get index" do
     subject { get :index, format: :json }
     let!(:due_date) { FactoryBot.create(:due_date) }
@@ -22,6 +24,12 @@ RSpec.describe DueDatesController, type: :controller do
 
       it "manager will see all due_dates" do
         sign_in user
+        json = JSON.parse(subject.body)
+        expect(json["data"].length).to eq(2)
+      end
+
+      it "coordinator will see all due_dates" do
+        sign_in coordinator
         json = JSON.parse(subject.body)
         expect(json["data"].length).to eq(2)
       end
@@ -76,6 +84,11 @@ RSpec.describe DueDatesController, type: :controller do
         sign_in user
         expect(subject).to be_forbidden
       end
+
+      it "will not allow a coordinator to create a due_date" do
+        sign_in coordinator
+        expect(subject).to be_forbidden
+      end
     end
   end
 
@@ -107,6 +120,11 @@ RSpec.describe DueDatesController, type: :controller do
         sign_in user
         expect(subject).to be_forbidden
       end
+
+      it "will not allow a coordinator to update a due_date" do
+        sign_in coordinator
+        expect(subject).to be_forbidden
+      end
     end
   end
 
@@ -131,6 +149,11 @@ RSpec.describe DueDatesController, type: :controller do
 
       it "will not allow a manager to delete a due_date" do
         sign_in user
+        expect(subject).to be_forbidden
+      end
+
+      it "will not allow a coordinator to delete a due_date" do
+        sign_in coordinator
         expect(subject).to be_forbidden
       end
     end

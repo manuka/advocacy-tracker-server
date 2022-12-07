@@ -26,6 +26,12 @@ RSpec.describe MeasureActorsController, type: :controller do
         it { expect(subject).to be_ok }
       end
 
+      context "as coordinator" do
+        before { sign_in FactoryBot.create(:user, :coordinator) }
+
+        it { expect(subject).to be_ok }
+      end
+
       context "as admin" do
         before { sign_in FactoryBot.create(:user, :admin) }
 
@@ -45,6 +51,12 @@ RSpec.describe MeasureActorsController, type: :controller do
     context "when signed in" do
       context "as analyst" do
         before { sign_in FactoryBot.create(:user, :analyst) }
+
+        it { expect(subject).to be_ok }
+      end
+
+      context "as coordinator" do
+        before { sign_in FactoryBot.create(:user, :coordinator) }
 
         it { expect(subject).to be_ok }
       end

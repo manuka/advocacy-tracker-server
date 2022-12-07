@@ -14,6 +14,7 @@ RSpec.describe ProgressReportsController, type: :controller do
     end
 
     context "when signed in" do
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
       let(:guest) { FactoryBot.create(:user) }
       let(:manager) { FactoryBot.create(:user, :manager) }
 
@@ -24,6 +25,12 @@ RSpec.describe ProgressReportsController, type: :controller do
 
       it "manager will see draft progress_reports" do
         sign_in manager
+        json = JSON.parse(subject.body)
+        expect(json["data"].length).to eq(2)
+      end
+
+      it "coordinator will see draft progress_reports" do
+        sign_in coordinator
         json = JSON.parse(subject.body)
         expect(json["data"].length).to eq(2)
       end
@@ -51,8 +58,9 @@ RSpec.describe ProgressReportsController, type: :controller do
     end
 
     context "when signed in" do
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
       let(:guest) { FactoryBot.create(:user) }
-      let(:user) { FactoryBot.create(:user, :manager) }
+      let(:manager) { FactoryBot.create(:user, :manager) }
       let(:due_date) { FactoryBot.create(:due_date) }
       let(:indicator) { FactoryBot.create(:indicator) }
 
@@ -88,19 +96,24 @@ RSpec.describe ProgressReportsController, type: :controller do
       end
 
       it "will allow a manager to create a progress_report" do
-        sign_in user
+        sign_in manager
+        expect(subject).to be_created
+      end
+
+      it "will allow a coordinator to create a progress_report" do
+        sign_in coordinator
         expect(subject).to be_created
       end
 
       it "will record what manager created the progress_report", versioning: true do
         expect(PaperTrail).to be_enabled
-        sign_in user
+        sign_in manager
         json = JSON.parse(subject.body)
-        expect(json["data"]["attributes"]["updated_by_id"].to_i).to eq user.id
+        expect(json["data"]["attributes"]["updated_by_id"].to_i).to eq manager.id
       end
 
       it "will return an error if params are incorrect" do
-        sign_in user
+        sign_in manager
         post :create, format: :json, params: {progress_report: {description: "desc only"}}
         expect(response).to have_http_status(422)
       end
@@ -125,8 +138,9 @@ RSpec.describe ProgressReportsController, type: :controller do
 
     context "when user signed in" do
       let(:admin) { FactoryBot.create(:user, :admin) }
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
       let(:guest) { FactoryBot.create(:user) }
-      let(:user) { FactoryBot.create(:user, :manager) }
+      let(:manager) { FactoryBot.create(:user, :manager) }
       let(:admin_indicator) { FactoryBot.create(:indicator, manager: admin) }
       let(:progress_report_with_admin) { FactoryBot.create(:progress_report, indicator: admin_indicator) }
 
@@ -143,12 +157,17 @@ RSpec.describe ProgressReportsController, type: :controller do
       end
 
       it "will allow a manager to update a progress_report" do
-        sign_in user
+        sign_in manager
+        expect(subject).to be_ok
+      end
+
+      it "will allow a coordinator to update a progress_report" do
+        sign_in coordinator
         expect(subject).to be_ok
       end
 
       it "will reject an update where the last_updated_at is older than updated_at in the database" do
-        sign_in user
+        sign_in manager
         progress_report_get = get :show, params: {id: progress_report_with_admin}, format: :json
         json = JSON.parse(progress_report_get.body)
         current_update_at = json["data"]["attributes"]["updated_at"]
@@ -171,21 +190,21 @@ RSpec.describe ProgressReportsController, type: :controller do
 
       it "will record what manager updated the progress_report", versioning: true do
         expect(PaperTrail).to be_enabled
-        sign_in user
+        sign_in manager
         json = JSON.parse(subject.body)
-        expect(json["data"]["attributes"]["updated_by_id"].to_i).to eq user.id
+        expect(json["data"]["attributes"]["updated_by_id"].to_i).to eq manager.id
       end
 
       it "will return the latest updated_by", versioning: true do
         expect(PaperTrail).to be_enabled
         progress_report.versions.first.update_column(:whodunnit, admin.id)
-        sign_in user
+        sign_in manager
         json = JSON.parse(subject.body)
-        expect(json["data"]["attributes"]["updated_by_id"].to_i).to eq(user.id)
+        expect(json["data"]["attributes"]["updated_by_id"].to_i).to eq(manager.id)
       end
 
       it "will return an error if params are incorrect" do
-        sign_in user
+        sign_in manager
         put :update, format: :json, params: {id: progress_report, progress_report: {title: ""}}
         expect(response).to have_http_status(422)
       end
@@ -203,8 +222,9 @@ RSpec.describe ProgressReportsController, type: :controller do
     end
 
     context "when user signed in" do
+      let(:coordinator) { FactoryBot.create(:user, :coordinator) }
       let(:guest) { FactoryBot.create(:user) }
-      let(:user) { FactoryBot.create(:user, :manager) }
+      let(:manager) { FactoryBot.create(:user, :manager) }
 
       it "will not allow a guest to delete a progress_report" do
         sign_in guest
@@ -212,7 +232,12 @@ RSpec.describe ProgressReportsController, type: :controller do
       end
 
       it "will allow a manager to delete a progress_report" do
-        sign_in user
+        sign_in manager
+        expect(subject).to be_no_content
+      end
+
+      it "will allow a coordinator to delete a progress_report" do
+        sign_in coordinator
         expect(subject).to be_no_content
       end
     end

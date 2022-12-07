@@ -3,6 +3,7 @@ require "json"
 
 RSpec.describe ActorMeasuresController, type: :controller do
   let(:analyst) { FactoryBot.create(:user, :analyst) }
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
   let(:guest) { FactoryBot.create(:user) }
   let(:user) { FactoryBot.create(:user, :manager) }
 
@@ -26,6 +27,12 @@ RSpec.describe ActorMeasuresController, type: :controller do
         it { expect(subject).to be_ok }
       end
 
+      context "as coordinator" do
+        before { sign_in FactoryBot.create(:user, :coordinator) }
+
+        it { expect(subject).to be_ok }
+      end
+
       context "as admin" do
         before { sign_in FactoryBot.create(:user, :admin) }
 
@@ -45,6 +52,12 @@ RSpec.describe ActorMeasuresController, type: :controller do
     context "when signed in" do
       context "as analyst" do
         before { sign_in FactoryBot.create(:user, :analyst) }
+
+        it { expect(subject).to be_ok }
+      end
+
+      context "as coordinator" do
+        before { sign_in FactoryBot.create(:user, :coordinator) }
 
         it { expect(subject).to be_ok }
       end
@@ -87,6 +100,13 @@ RSpec.describe ActorMeasuresController, type: :controller do
       it "will not allow an analyst to update an actor_measure" do
         sign_in analyst
         expect(subject).to be_forbidden
+      end
+
+      it "will allow a coordinator to update an actor_measure" do
+        sign_in coordinator
+        expect(subject).to be_ok
+        json = JSON.parse(response.body)
+        expect(json.dig("data", "attributes", "value")).to eq("4.2")
       end
 
       it "will allow a manager to update an actor_measure" do

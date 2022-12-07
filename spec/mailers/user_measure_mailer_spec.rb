@@ -50,9 +50,6 @@ RSpec.describe UserMeasureMailer, type: :mailer do
       expect(mail.body.encoded).to match(user_measure.user.name)
     end
 
-    it "mentions the measure title" do
-      expect(mail.body.encoded).to match(user_measure.measure.title)
-    end
   end
 
   describe "task_updated" do

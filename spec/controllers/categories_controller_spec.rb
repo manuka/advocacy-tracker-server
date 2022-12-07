@@ -4,6 +4,7 @@ require "json"
 RSpec.describe CategoriesController, type: :controller do
   let(:admin) { FactoryBot.create(:user, :admin) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
   let(:taxonomy) { FactoryBot.create(:taxonomy) }
@@ -91,6 +92,7 @@ RSpec.describe CategoriesController, type: :controller do
   describe "Get show" do
     let(:category) { FactoryBot.create(:category) }
     let(:private_category) { FactoryBot.create(:category, :private) }
+    let(:private_category_by_coordinator) { FactoryBot.create(:category, :private, created_by_id: coordinator.id) }
     let(:private_category_by_manager) { FactoryBot.create(:category, :private, created_by_id: manager.id) }
     let(:requested_resource) { category }
 
@@ -105,6 +107,24 @@ RSpec.describe CategoriesController, type: :controller do
         before { sign_in admin }
 
         it { expect(subject).to be_ok }
+      end
+
+      context "as coordinator" do
+        before { sign_in coordinator }
+
+        it { expect(subject).to be_ok }
+
+        context "who created will see" do
+          let(:requested_resource) { private_category_by_coordinator }
+
+          it { expect(subject).to be_ok }
+        end
+
+        context "who didn't create will see" do
+          let(:requested_resource) { private_category }
+
+          it { expect(subject).to be_ok }
+        end
       end
 
       context "as manager" do
@@ -160,6 +180,11 @@ RSpec.describe CategoriesController, type: :controller do
         expect(subject).to be_created
       end
 
+      it "will allow a coordinator to create a category" do
+        sign_in coordinator
+        expect(subject).to be_created
+      end
+
       context "is_archive" do
         let(:params) do
           {
@@ -176,6 +201,12 @@ RSpec.describe CategoriesController, type: :controller do
 
         it "can't be set by manager" do
           sign_in manager
+          expect(subject).to be_created
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
+        end
+
+        it "can't be set by coordinator" do
+          sign_in coordinator
           expect(subject).to be_created
           expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
         end
@@ -228,8 +259,8 @@ RSpec.describe CategoriesController, type: :controller do
         expect(subject).to be_forbidden
       end
 
-      it "will allow a manager to update a category" do
-        sign_in manager
+      it "will allow a coordinator to update a category" do
+        sign_in coordinator
         expect(subject).to be_ok
       end
 
@@ -241,6 +272,11 @@ RSpec.describe CategoriesController, type: :controller do
       context "is_archive" do
         subject do
           put :update, format: :json, params: {id: category, category: {is_archive: true}}
+        end
+
+        it "can't be set by coordinator" do
+          sign_in coordinator
+          expect(JSON.parse(subject.body).dig("data", "attributes", "is_archive")).to eq false
         end
 
         it "can't be set by manager" do

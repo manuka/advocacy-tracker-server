@@ -6,6 +6,7 @@ require "json"
 RSpec.describe MeasuresController, type: :controller do
   let(:admin) { FactoryBot.create(:user, :admin) }
   let(:analyst) { FactoryBot.create(:user, :analyst) }
+  let(:coordinator) { FactoryBot.create(:user, :coordinator) }
   let(:guest) { FactoryBot.create(:user) }
   let(:manager) { FactoryBot.create(:user, :manager) }
 
@@ -38,6 +39,12 @@ RSpec.describe MeasuresController, type: :controller do
           expect(json["data"].length).to eq(2)
         end
 
+        it "coordinator will see draft measures" do
+          sign_in coordinator
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(2)
+        end
+
         it "analyst will not see draft measures" do
           sign_in analyst
 
@@ -62,6 +69,12 @@ RSpec.describe MeasuresController, type: :controller do
           expect(json["data"].length).to eq(1)
         end
 
+        it "coordinator will not see" do
+          sign_in coordinator
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(1)
+        end
+
         it "analyst will not see" do
           sign_in analyst
 
@@ -74,11 +87,12 @@ RSpec.describe MeasuresController, type: :controller do
         let!(:measure) { FactoryBot.create(:measure, :not_private) }
         let!(:private_measure) { FactoryBot.create(:measure, :private) }
         let!(:private_measure_by_manager) { FactoryBot.create(:measure, :private, created_by_id: manager.id) }
+        let!(:private_measure_by_coordinator) { FactoryBot.create(:measure, :private, created_by_id: coordinator.id) }
 
         it "admin will see" do
           sign_in admin
           json = JSON.parse(subject.body)
-          expect(json["data"].length).to eq(3)
+          expect(json["data"].length).to eq(4)
         end
 
         it "manager who created will see" do
@@ -91,6 +105,18 @@ RSpec.describe MeasuresController, type: :controller do
           sign_in FactoryBot.create(:user, :manager)
           json = JSON.parse(subject.body)
           expect(json["data"].length).to eq(1)
+        end
+
+        it "coordinator who created will see" do
+          sign_in coordinator
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(4)
+        end
+
+        it "coordinator who didn't create will see" do
+          sign_in FactoryBot.create(:user, :coordinator)
+          json = JSON.parse(subject.body)
+          expect(json["data"].length).to eq(4)
         end
       end
     end
